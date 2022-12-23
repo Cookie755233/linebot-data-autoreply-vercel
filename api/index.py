@@ -2,6 +2,7 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from db.mongo import count_docs
 
 import os
 
@@ -13,9 +14,7 @@ app = Flask(__name__)
 # domain root
 @app.route('/')
 def home():
-    with open(os.path.join('db', 'sample_data.csv'), 'r') as file:
-        txt = ','.join(file[:2])
-    return txt
+    return 'Hello Cookie!'
 
 @app.route("/webhook", methods=['POST'])
 def callback():
@@ -39,7 +38,7 @@ def handle_message(event):
     
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=tmpstr))
+        TextSendMessage(text=f"there're {count_docs()} data in MongoDB"))
 
 
 if __name__ == "__main__":

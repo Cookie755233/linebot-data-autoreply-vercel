@@ -9,16 +9,6 @@ client = MongoClient(cluster)
 db = client["test"]
 basics_database = db["basic"]
 
-# infos = [
-#     {"name": "Cookie", 
-#      "text": "Hello world", 
-#      "gender": "Male"},
-#     {"name": "Latte", 
-#      "text": "Hello there", 
-#      "gender": "Male"},
-# ]
-
-# basics_database.insert_many(infos)
-basics_database.delete_one({'name': 'Cookie'})
-print(basics_database.count_documents({}))
+def count_docs():
+    return basics_database.count_documents({})
 
