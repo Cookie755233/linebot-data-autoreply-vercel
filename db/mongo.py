@@ -35,8 +35,7 @@ def read_mongo(db=_connect_mongo(),
     cursor = db[collection].find(query)
     # Expand the cursor and construct the DataFrame
     df =  pd.DataFrame(iter(cursor))
-    # # Delete the _id
-    if no_id:
-        del df['_id']
 
+    # # Delete the _id
+    if no_id: del df['_id']
     return df
