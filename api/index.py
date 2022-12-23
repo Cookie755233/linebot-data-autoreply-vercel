@@ -7,7 +7,7 @@ from msg.reply import read_user_message
 import os
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
-line_handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
+handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
 app = Flask(__name__)
 
@@ -25,13 +25,13 @@ def callback():
     app.logger.info("Request body: " + body)
     # handle webhook body
     try:
-        line_handler.handle(body, signature)
+        handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
     return 'OK'
 
 
-@line_handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     if event.message.type != "text":
         return
@@ -41,8 +41,8 @@ def handle_message(event):
     
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=f"there're {reply_message} data in MongoDB"))
+        TextSendMessage(text=reply_message))
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
