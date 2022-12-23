@@ -4,18 +4,18 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 import os
-from db.sample_db import fetch_db
+
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 line_handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 
-df = fetch_db()
-tmpstr = ','.join(df.columns)
 app = Flask(__name__)
 
 # domain root
 @app.route('/')
 def home():
-    return 'Hello, World!'
+    with open(os.path.join('db', 'sample_data.csv'), 'r') as file:
+        txt = ','.join(file[:2])
+    return txt
 
 @app.route("/webhook", methods=['POST'])
 def callback():
