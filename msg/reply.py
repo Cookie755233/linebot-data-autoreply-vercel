@@ -1,6 +1,6 @@
 
 import re
-from db.mongo import read_mongo
+
 
 def read_user_message(user_message: str):
     if re.match('hello', user_message):
@@ -9,9 +9,7 @@ def read_user_message(user_message: str):
     if re.match('bye', user_message):
         return 'Cya!'
 
-    if re.match('title', user_message):
-        df = read_mongo()
-        
-        return ','.join(df.columns)
+    if re.match('test', user_message):
+        return 
     
     return
