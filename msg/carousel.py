@@ -175,8 +175,8 @@ def insert_parcel_search_result(search_result, carousel_container):
 
         for a in applicants:
             name = a["name"]
-            cap = float(a["capacity"])
-            area = float(a["caseArea"])
+            cap = float(a["capacity"].replace(',', ''))
+            area = float(a["caseArea"].replace(',', ''))
             stat = a["status"]
 
             bubble = insert_body_contents_ITEM(bubble, 
@@ -196,8 +196,8 @@ def insert_applicant_search_result(search_result, carousel_container):
         _id  = str(result['_id'])
         sess = result['session']
         name = result['name']
-        cap  = float(result['capacity'])
-        area = float(result['caseArea'])
+        cap  = float(result['capacity'].replace(',', ''))
+        area = float(result['caseArea'].replace(',', ''))
         stat = result['status']
         
         
