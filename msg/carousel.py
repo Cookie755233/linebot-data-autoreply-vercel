@@ -214,7 +214,7 @@ def insert_applicant_search_result(search_result, carousel_container):
                                            "案件資訊概覽",
                                            "設置容量", f"{cap:,.2f}  kW",
                                            "土地面積", f"{area:,.2f}  m2",
-                                           "", "")
+                                           "---", "---")
         bubble = insert_body_contents_SEP(bubble)
         bubble = insert_body_contents_FOOTER(bubble, 
                                              "ID", f"#{_id}")

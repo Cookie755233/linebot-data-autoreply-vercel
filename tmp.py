@@ -47,7 +47,10 @@ line_bot_api = LineBotApi(
 #     return CAROUSEL_CONTAINER
 
 
+CAROUSEL_CONTAINER = {"type": "carousel", "contents": []}
+insert_applicant_search_result(list(search_info_by_applicant('99號場')), CAROUSEL_CONTAINER)
+pprint(CAROUSEL_CONTAINER)
 
-# pprint(
-#     list(search_applicants_by_parcel('七股區', '七股段', '10'))
-#     )
+CAROUSEL_CONTAINER = {"type": "carousel", "contents": []}
+insert_parcel_search_result(list(search_applicants_by_parcel('七股區','七股段','353-13')), CAROUSEL_CONTAINER)
+pprint(CAROUSEL_CONTAINER)
