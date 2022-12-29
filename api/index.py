@@ -3,14 +3,19 @@ import re
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, FlexSendMessage
-
+from linebot.models import (
+    MessageEvent, PostbackEvent,
+    TextMessage, TextSendMessage, FlexSendMessage, LocationSendMessage
+)
 from msg.carousel import *
 from utils.ls_search import search_applicants_by_parcel, search_info_by_applicant
 
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 line_handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
+
+LONGITUDE, LATITUDE = 22.997794817050508, 120.21412529937666
+
 
 app = Flask(__name__)
 
@@ -88,6 +93,15 @@ def handle_message(event):
             FlexSendMessage(alt_text="Search results", 
                             contents=CAROUSEL_CONTAINER))
 
+@line_handler.add(PostbackEvent)
+def handle_postback(event):
+    if event.postback.data=='location':
+        line_bot_api.reply_message(event.reply_token, LocationSendMessage(
+            title = "tainan station",
+            address = "tainan station address",
+            latitude = LONGITUDE,
+            longitude = LATITUDE
+        ))   
 
 if __name__ == "__main__":
     app.run(debug=True)

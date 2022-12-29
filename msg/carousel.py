@@ -1,11 +1,21 @@
+
 def create_bubble():
     return {
         "type": "bubble",
-        "body": {"type": "box", "layout": "vertical", "contents": []},
-        "styles": {"footer": {"separator": True}},
+        "body": {
+            "type": "box",
+            "layout": "vertical", 
+            "contents": []
+            },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [],
+            "spacing": "sm"
+        }
     }
 
-
+#? <-- insert contents into bubbles: sub functions -->
 def insert_body_contents_TITLE(bubble, 
                                top,     #? 上標（綠字/紅字）
                                title,   
@@ -153,11 +163,27 @@ def insert_body_contents_FOOTER(bubble,
     return bubble
 
 
+def insert_footer_contents_BOTTON(bubble):
+    bubble['footer']['contents'].append(
+        {
+            "type": "button",
+            "action": {
+                "type": "postback",
+                "label": "取得位置資訊",
+                "data": "location",
+                "displayText": "取得位置資訊"
+            },
+        }
+    )
+    return bubble
+
+
 def insert_body_contents_SEP(bubble):
     bubble["body"]["contents"].append({"type": "separator", "margin": "xxl"})
     return bubble
 
 
+#? <-- insert search result into bubbles: main functions -->
 def insert_parcel_search_result(search_result, carousel_container):
     for i, result in enumerate(search_result):
         _id  = result['_id']
@@ -190,6 +216,8 @@ def insert_parcel_search_result(search_result, carousel_container):
 
         bubble = insert_body_contents_FOOTER(bubble, 
                                              "PARCEL ID", f"#{_id}")
+        bubble = insert_footer_contents_BOTTON(bubble)
+        
         carousel_container["contents"].append(bubble)
 
 
@@ -219,9 +247,49 @@ def insert_applicant_search_result(search_result, carousel_container):
                                            "案件資訊概覽",
                                            "設置容量", f"{cap:,.2f}  kW",
                                            "土地面積", f"{area:,.2f}  m2",
-                                           "---", "---")
+                                           "placeHolder", "---")
         bubble = insert_body_contents_SEP(bubble)
         bubble = insert_body_contents_FOOTER(bubble, 
                                              "ID", f"#{_id}")
         
         carousel_container["contents"].append(bubble)
+
+
+{
+  "type": "bubble",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+    ]
+  },
+  "footer": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "button",
+        "action": {
+          "type": "postback",
+          "label": "取得位置資訊a",
+          "data": "get_location",
+          "displayText": "取得位置資訊"
+        },
+        "style": "primary"
+      }
+    ],
+    "spacing": "sm"
+  }
+}
+
+
+{
+  "type": "bubble",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+    ]
+  },
+
+}
