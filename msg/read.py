@@ -12,3 +12,5 @@ def read_user_message(user_message: str):
 def _is_valid_parcel(user_message: str) -> bool:
     return len(user_message.split('\n')) == 4
     
+def _is_valid_name(user_message: str) -> bool:
+    return 1 < len(user_message.split('\n')) < 4

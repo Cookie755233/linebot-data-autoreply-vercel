@@ -6,25 +6,29 @@ def create_bubble():
     }
 
 
-def insert_body_contents_TITLE(bubble, dist, sect, prcl, i, cnt):
+def insert_body_contents_TITLE(bubble, 
+                               top,     #? 上標（綠字）
+                               title,   
+                               appendix 
+                               ):    
     bubble["body"]["contents"] += [
         {
             "type": "text",
-            "text": f"RESULT {i+1}",
+            "text": top,
             "weight": "bold",
             "color": "#46844f",
             "size": "xs",
         },
         {
             "type": "text",
-            "text": f"{dist}{sect}{prcl}地號",
+            "text": title,
             "weight": "bold",
             "size": "lg",
             "margin": "md",
         },
         {
             "type": "text",
-            "text": f"共計 {cnt} 個申請案件",
+            "text": appendix,
             "size": "xs",
             "color": "#aaaaaa",
             "wrap": True,
@@ -33,7 +37,12 @@ def insert_body_contents_TITLE(bubble, dist, sect, prcl, i, cnt):
     return bubble
 
 
-def insert_body_contents_ITEM(bubble, name, cap, area, stat):
+def insert_body_contents_ITEM(bubble, 
+                              subtitle,     #? subtitle
+                              key_1, val_1, #? attribute 1
+                              key_2, val_2, #? attribute 2
+                              key_3, val_3, #? attribute 3
+                              ):
     bubble["body"]["contents"] += [
         {
             "type": "box",
@@ -43,7 +52,7 @@ def insert_body_contents_ITEM(bubble, name, cap, area, stat):
             "contents": [
                 {
                     "type": "text",
-                    "text": f"{name}",
+                    "text": subtitle,
                     "size": "md",
                     "weight": "bold",
                     "color": "#46844f",
@@ -54,14 +63,14 @@ def insert_body_contents_ITEM(bubble, name, cap, area, stat):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "設置容量",
+                            "text": key_1,
                             "size": "sm",
                             "color": "#555555",
                             "flex": 0,
                         },
                         {
                             "type": "text",
-                            "text": f"{cap:,.2f}  kW",
+                            "text": val_1,
                             "size": "sm",
                             "color": "#111111",
                             "align": "end",
@@ -74,14 +83,14 @@ def insert_body_contents_ITEM(bubble, name, cap, area, stat):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "土地面積",
+                            "text": key_2,
                             "size": "sm",
                             "color": "#555555",
                             "flex": 0,
                         },
                         {
                             "type": "text",
-                            "text": f"{area:,.2f}  m2",
+                            "text": val_2,
                             "size": "sm",
                             "color": "#111111",
                             "align": "end",
@@ -94,14 +103,14 @@ def insert_body_contents_ITEM(bubble, name, cap, area, stat):
                     "contents": [
                         {
                             "type": "text",
-                            "text": "案件狀態",
+                            "text": key_3,
                             "size": "sm",
                             "color": "#555555",
                             "flex": 0,
                         },
                         {
                             "type": "text",
-                            "text": f"{stat}",
+                            "text": val_3,
                             "size": "sm",
                             "color": "#111111",
                             "align": "end",
@@ -114,7 +123,8 @@ def insert_body_contents_ITEM(bubble, name, cap, area, stat):
     return bubble
 
 
-def insert_body_contents_FOOTER(bubble, footer):
+def insert_body_contents_FOOTER(bubble, 
+                                key_1, val_1):
     bubble["body"]["contents"] += [
         {
             "type": "box",
@@ -123,14 +133,14 @@ def insert_body_contents_FOOTER(bubble, footer):
             "contents": [
                 {
                     "type": "text",
-                    "text": "PARCEL ID",
+                    "text": key_1,
                     "size": "xs",
                     "color": "#aaaaaa",
                     "flex": 0,
                 },
                 {
                     "type": "text",
-                    "text": f"#{footer}",
+                    "text": val_1,
                     "color": "#aaaaaa",
                     "size": "xs",
                     "align": "end",
@@ -146,27 +156,68 @@ def insert_body_contents_SEP(bubble):
     return bubble
 
 
-def insert_search_result(search_result, carousel_container):
+def insert_parcel_search_result(search_result, carousel_container):
     for i, result in enumerate(search_result):
         _id  = result['_id']
         dist = result["districtName"]
         sect = result["sectionName"]
         prcl = result["prcl"]
-        cnt  = int(result["applicantCount"])
+        luz  = result['landUseZoning']
+        lut  = result['landUseType']
         applicants = result["applicants"]
         
         bubble = create_bubble()
-        bubble = insert_body_contents_TITLE(bubble, dist, sect, prcl, i, cnt)
+        bubble = insert_body_contents_TITLE(bubble, 
+                                            f'RESULT {i+1}',
+                                            f"{dist}{sect}{prcl}地號",
+                                            f"{luz} - {lut}")
         bubble = insert_body_contents_SEP(bubble)
 
-        for j, a in enumerate(applicants):
+        for a in applicants:
             name = a["name"]
             cap = float(a["capacity"])
             area = float(a["caseArea"])
             stat = a["status"]
 
-            bubble = insert_body_contents_ITEM(bubble, name, cap, area, stat)
+            bubble = insert_body_contents_ITEM(bubble, 
+                                               name, 
+                                               "設置容量", f"{cap:,.2f}  kW",
+                                               "土地面積", f"{area:,.2f}  m2",
+                                               "案件狀態", stat)
             bubble = insert_body_contents_SEP(bubble)
 
-        bubble = insert_body_contents_FOOTER(bubble, _id)
+        bubble = insert_body_contents_FOOTER(bubble, 
+                                             "PARCEL ID", f"#{_id}")
         carousel_container["contents"].append(bubble)
+
+
+def insert_applicant_search_result(search_result, carousel_container):
+    for i, result in enumerate(search_result):
+        _id  = str(result['_id'])
+        sess = result['session']
+        name = result['name']
+        cap  = float(result['capacity'])
+        area = float(result['caseArea'])
+        stat = result['status']
+        
+        
+        bubble = create_bubble()
+        bubble = insert_body_contents_TITLE(bubble, 
+                                            stat,
+                                            name,
+                                            f"第 {sess} 次聯審會議")
+        
+            
+        
+        bubble = insert_body_contents_SEP(bubble)
+        bubble = insert_body_contents_ITEM(bubble,
+                                           "案件資訊概覽",
+                                           "設置容量", f"{cap:,.2f}  kW",
+                                           "土地面積", f"{area:,.2f}  m2",
+                                           "", "")
+        bubble = insert_body_contents_SEP(bubble)
+        bubble = insert_body_contents_FOOTER(bubble, 
+                                             "ID", f"#{_id}")
+        
+        carousel_container["contents"].append(bubble)
+    return

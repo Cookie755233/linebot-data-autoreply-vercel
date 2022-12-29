@@ -5,9 +5,8 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, FlexSendMessage
 
-from msg.read import _is_valid_parcel
 from msg.carousel import *
-from utils.ls_search import search_applicants_by_parcel
+from utils.ls_search import search_applicants_by_parcel, search_info_by_applicant
 
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
@@ -45,14 +44,13 @@ def handle_message(event):
     if re.match("hi", user_message):
         line_bot_api.reply_message(event.reply_token, TextSendMessage("Hello!"))
 
-    if re.match("地號", user_message):
-        if not _is_valid_parcel(user_message):
-            reply_message = "請輸入正確格式:\n查詢地號\nＯＯ區\nＯＯ段\nＯＯＯ"
+    if re.match("查詢地號", user_message):
+        if not len(user_message.split('\n')) == 4:
+            reply_message = "請輸入正確格式:\n查詢地號\nＯＯ區(必須輸入正確行政區)\nＯＯ段(必須輸入正確地段)\nＯＯＯ(支持模糊匹配)"
             line_bot_api.reply_message(
                 event.reply_token, 
                 TextSendMessage(reply_message))
             return
-
         CAROUSEL_CONTAINER = {"type": "carousel", "contents": []}
         _, district, section, parcel = user_message.split("\n")
 
@@ -64,14 +62,31 @@ def handle_message(event):
                 TextSendMessage(reply_message))
             return
             
-        insert_search_result(result, CAROUSEL_CONTAINER)
+        insert_parcel_search_result(result, CAROUSEL_CONTAINER)
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage(alt_text="Search results", 
                             contents=CAROUSEL_CONTAINER))
         
-
-
+    if re.match("查詢申請人", user_message):
+        if len(user_message.split('\n')) != 2: 
+            reply_message = "請輸入正確格式:\n查詢申請人\nＯＯＯ(支持模糊匹配)"
+            line_bot_api.reply_message(
+                event.reply_token, 
+                TextSendMessage(reply_message))
+            return
+        
+        CAROUSEL_CONTAINER = {"type": "carousel", "contents": []}
+        _, name = user_message.split('\n')
+        
+        result = list(search_info_by_applicant(name))
+        
+        
+        insert_applicant_search_result(result, CAROUSEL_CONTAINER)
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage(alt_text="Search results", 
+                            contents=CAROUSEL_CONTAINER))
 
 
 if __name__ == "__main__":

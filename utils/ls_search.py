@@ -37,15 +37,14 @@ def search_applicants_by_parcel(district, section, number,
     return result
 
 
-def search_info_by_applicant(user_input: str,
+def search_info_by_applicant(name: str,
                              applicant: _connect_mongo().ls.applicant):
-    _, name = user_input.split("\n")
     result = applicant.aggregate([
     {
         "$match":{ 
             "$and":[
                 {"name": {"$regex": name}},
-                {"status": "已核准"}
+                # {"status": "已核准"}
             ]
         }
     },
