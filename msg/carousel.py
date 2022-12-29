@@ -193,6 +193,8 @@ def insert_parcel_search_result(search_result, carousel_container):
 
 def insert_applicant_search_result(search_result, carousel_container):
     for i, result in enumerate(search_result):
+        if i >= 11: break
+
         _id  = str(result['_id'])
         sess = result['session']
         name = result['name']
@@ -220,4 +222,3 @@ def insert_applicant_search_result(search_result, carousel_container):
                                              "ID", f"#{_id}")
         
         carousel_container["contents"].append(bubble)
-    return
