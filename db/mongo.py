@@ -90,66 +90,6 @@ def _connect_mongo(username=USERNAME,
 # create_applicants_collection(applicant)
 
 
-def search_applicants_by_parcel(user_input: str,
-                                parcel: pymongo.collection.Collection):
-    _, district, section, number = user_input.split("\n")
-    result = parcel.aggregate([
-            {
-                "$match":{
-                    "$and":[
-                        {"districtName": {"$regex": f"{district}"}},
-                        {"sectionName": f"{section}"},
-                        {"prcl": {"$regex": f"{number}"}}
-                    ]
-                } 
-            },
-            {
-                "$lookup":{
-                    "from": "applicant",
-                    "localField": "_id",
-                    "foreignField": "parcels",
-                    "as": "applicants"
-                }
-            },
-            {
-                "$project":{
-                    "districtName":1,
-                    "sectionName":1,
-                    "prcl":1,
-                    "applicantCount": {
-                        "$size": { "$ifNull": [ "$applicants", [] ] }},
-                    "applicants": 1
-                }
-            }
-        ])
-    
-    
-    return result
-
-
-def search_info_by_keywords(user_input: str,
-                            applicant: pymongo.collection.Collection):
-    _, keyword = user_input.split("\n")
-    result = applicant.aggregate([
-    {
-        "$match":{ 
-            "$and":[
-                {"name": {"$regex": keyword}},
-                {"status": "已核准"}
-            ]
-        }
-    },
-    {
-        "$lookup":{
-            "from": "parcel",
-            "localField": "parcels",
-            "foreignField": "_id",
-            "as": "parcel_comprehensive"
-        }
-    },
-    ])
-    
-    return result
 
 # pprint(list(search_applicants_by_parcel("查詢地號\n新營區\n後鎮段\n676", parcel)))
 # pprint(list(search_info_by_keywords("查詢關鍵字\n山", applicant)))
