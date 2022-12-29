@@ -1,16 +1,13 @@
-
 def create_bubble():
     return {
         "type": "bubble",
-        "body": {"type": "box", 
-                 "layout": "vertical",
-                 "contents": []},
-        "styles": {"footer": {"separator": True}}
+        "body": {"type": "box", "layout": "vertical", "contents": []},
+        "styles": {"footer": {"separator": True}},
     }
 
 
 def insert_body_contents_TITLE(bubble, dist, sect, prcl, i, cnt):
-    bubble['body']['contents'] += [
+    bubble["body"]["contents"] += [
         {
             "type": "text",
             "text": f"RESULT {i+1}",
@@ -36,15 +33,8 @@ def insert_body_contents_TITLE(bubble, dist, sect, prcl, i, cnt):
     return bubble
 
 
-def insert_body_contents_SEP(bubble):
-    bubble['body']['contents'].append(
-        {"type": "separator", "margin": "xxl"}
-    )
-    return bubble
-
-
 def insert_body_contents_ITEM(bubble, name, cap, area, stat):
-    bubble['body']['contents'] += [
+    bubble["body"]["contents"] += [
         {
             "type": "box",
             "layout": "vertical",
@@ -124,25 +114,59 @@ def insert_body_contents_ITEM(bubble, name, cap, area, stat):
     return bubble
 
 
+def insert_body_contents_FOOTER(bubble, footer):
+    bubble["body"]["contents"] += [
+        {
+            "type": "box",
+            "layout": "horizontal",
+            "margin": "md",
+            "contents": [
+                {
+                    "type": "text",
+                    "text": "PARCEL ID",
+                    "size": "xs",
+                    "color": "#aaaaaa",
+                    "flex": 0,
+                },
+                {
+                    "type": "text",
+                    "text": f"#{footer}",
+                    "color": "#aaaaaa",
+                    "size": "xs",
+                    "align": "end",
+                },
+            ],
+        }
+    ]
+    return bubble
+
+
+def insert_body_contents_SEP(bubble):
+    bubble["body"]["contents"].append({"type": "separator", "margin": "xxl"})
+    return bubble
+
+
 def insert_search_result(search_result, carousel_container):
     for i, result in enumerate(search_result):
+        _id  = result['_id']
         dist = result["districtName"]
         sect = result["sectionName"]
         prcl = result["prcl"]
-        cnt = int(result["applicantCount"])
+        cnt  = int(result["applicantCount"])
         applicants = result["applicants"]
         
         bubble = create_bubble()
         bubble = insert_body_contents_TITLE(bubble, dist, sect, prcl, i, cnt)
         bubble = insert_body_contents_SEP(bubble)
-        
+
         for j, a in enumerate(applicants):
             name = a["name"]
             cap = float(a["capacity"])
             area = float(a["caseArea"])
-            stat = a['status']
+            stat = a["status"]
+
             bubble = insert_body_contents_ITEM(bubble, name, cap, area, stat)
-            
-            if j < cnt - 1:
-                bubble = insert_body_contents_SEP(bubble)
+            bubble = insert_body_contents_SEP(bubble)
+
+        bubble = insert_body_contents_FOOTER(bubble, _id)
         carousel_container["contents"].append(bubble)
