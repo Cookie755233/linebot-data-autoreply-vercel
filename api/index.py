@@ -42,7 +42,7 @@ def handle_message(event):
     
     if isinstance(reply, str):
         line_bot_api.reply_message(
-            event.reply_token, TextMessage(reply)
+            event.reply_token, TextSendMessage(reply)
         )
     else:
         carousel_container = {"type": "carousel", "contents": []}
