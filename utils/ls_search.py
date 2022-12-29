@@ -1,5 +1,5 @@
 
-from db.mongo import _connect_mongo
+from db._connect import _connect_mongo
 
 def search_applicants_by_parcel(district, section, number,
                                 parcel=_connect_mongo().ls.parcel):

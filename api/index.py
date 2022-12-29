@@ -8,6 +8,7 @@ from linebot.models import (
     TextMessage, TextSendMessage, FlexSendMessage, LocationSendMessage
 )
 from msg.carousel import *
+import msg.constants as CONST
 from utils.ls_search import search_applicants_by_parcel, search_info_by_applicant
 
 
@@ -51,15 +52,16 @@ def handle_message(event):
 
     if re.match("查詢地號", user_message):
         if not len(user_message.split('\n')) == 4:
-            reply_message = "請輸入正確格式:\n查詢地號\nＯＯ區(必須輸入正確行政區)\nＯＯ段(必須輸入正確地段)\nＯＯＯ(支持模糊匹配)"
+            reply_message = CONST.PARCEL_NOT_FOUND_ERROR
             line_bot_api.reply_message(
                 event.reply_token, 
                 TextSendMessage(reply_message))
             return
-        CAROUSEL_CONTAINER = {"type": "carousel", "contents": []}
+            
+        carousel_container = {"type": "carousel", "contents": []}
         _, district, section, parcel = user_message.split("\n")
-
         result = list(search_applicants_by_parcel(district, section, parcel))
+
         if not result:
             reply_message = f"查無「{district}{section}{parcel}地號」資料!"
             line_bot_api.reply_message(
@@ -67,31 +69,36 @@ def handle_message(event):
                 TextSendMessage(reply_message))
             return
             
-        insert_parcel_search_result(result, CAROUSEL_CONTAINER)
+        insert_parcel_search_result(result, carousel_container)
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage(alt_text="Search results", 
-                            contents=CAROUSEL_CONTAINER))
+                            contents=carousel_container))
         
     if re.match("查詢申請人", user_message):
         if len(user_message.split('\n')) != 2: 
-            reply_message = "請輸入正確格式:\n查詢申請人\nＯＯＯ(支持模糊匹配)"
+            reply_message = CONST.APPLICANT_NOT_FOUND_ERROR
             line_bot_api.reply_message(
                 event.reply_token, 
                 TextSendMessage(reply_message))
             return
         
-        CAROUSEL_CONTAINER = {"type": "carousel", "contents": []}
+        carousel_container = {"type": "carousel", "contents": []}
         _, name = user_message.split('\n')
         
         result = list(search_info_by_applicant(name))
+        if not result:
+                reply_message = f"查無「{name}」資料!"
+                line_bot_api.reply_message(
+                    event.reply_token, 
+                    TextSendMessage(reply_message))
+                return
         
-        
-        insert_applicant_search_result(result, CAROUSEL_CONTAINER)
+        insert_applicant_search_result(result, carousel_container)
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage(alt_text="Search results", 
-                            contents=CAROUSEL_CONTAINER))
+                            contents=carousel_container))
 
 @line_handler.add(PostbackEvent)
 def handle_postback(event):
