@@ -4,12 +4,12 @@ import numpy as np
 import pymongo
 import datetime as dt
 # password = os.getenv("MONGO_DB_PASSWORD")
-USERNAME = 'cookie'
+USERNAME = "cookie"
 PASSWORD = "Cokie7523"
 
 def _connect_mongo(username=USERNAME,
                    password=PASSWORD,
-                   db='basic') -> MongoClient:
+                   db="basic") -> MongoClient:
     """ A util for making a connection to mongo """
     mongo_uri = f"mongodb+srv://{username}:{password}@cluster0.xveirqo.mongodb.net/test?retryWrites=true&w=majority"
     client = MongoClient(mongo_uri)
@@ -19,40 +19,40 @@ def _connect_mongo(username=USERNAME,
 
 
 # def create_parcel_collection(collection: pymongo.collection.Collection):
-#     df = pd.read_excel('/Users/cookie/Desktop/ls20221220_tmp.xlsx')
+#     df = pd.read_excel("/Users/cookie/Desktop/ls20221220_tmp.xlsx")
 #     df.fillna(np.nan)
-#     df = df[['PN', 'TNAME', 'SECNAME', 'SECT', 'LANDNO8', 'LAND_NO', 
-#             'AREA', 'AA11', 'AA12', 'AA08', 'AA16', 'AA17',
-#             'BBType', 'BB09', 'Mng']]
-#     df.columns = ['_id', 'districtName', 'sectionName', 'prefix', 'prcl8', 'prcl',
-#                 'area', 'landUseZoning', 'landUseType', 'landCategory', 'presentValue', 'landValue',
-#                 'ownershipType', 'owner', 'admin']
+#     df = df[["PN", "TNAME", "SECNAME", "SECT", "LANDNO8", "LAND_NO", 
+#             "AREA", "AA11", "AA12", "AA08", "AA16", "AA17",
+#             "BBType", "BB09", "Mng"]]
+#     df.columns = ["_id", "districtName", "sectionName", "prefix", "prcl8", "prcl",
+#                 "area", "landUseZoning", "landUseType", "landCategory", "presentValue", "landValue",
+#                 "ownershipType", "owner", "admin"]
 #     df = df.drop_duplicates()
 #     df = df.astype({
-#         '_id': 'str',
-#         'prefix': 'str',
-#         'prcl8': 'str',
-#         'prcl': 'str',
-#         'landCategory': 'category',
-#         'landUseZoning': 'category',
-#         'landUseType': 'category',
+#         "_id": "str",
+#         "prefix": "str",
+#         "prcl8": "str",
+#         "prcl": "str",
+#         "landCategory": "category",
+#         "landUseZoning": "category",
+#         "landUseType": "category",
 #         })
-#     parcel_data = df.to_dict('records')
+#     parcel_data = df.to_dict("records")
 #     collection.insert_many(parcel_data)
 
 # def create_applicants_collection(collection: pymongo.collection.Collection):
-#     df = pd.read_excel('/Users/cookie/Desktop/ls20221220_tmp.xlsx')
+#     df = pd.read_excel("/Users/cookie/Desktop/ls20221220_tmp.xlsx")
 #     df.fillna(np.nan)
 
-#     df = df[['APPL', 'SESS', 'C_AREA', "CAP", 'STAT', 'PN',
-#             'ALUC_DT', 'EA_DT', 'LCC_DT', 'LCR_DT', 
-#             'AJOC', 'BLDG', 'NBR', 'ESA', 'INR', 'EXPLICIT']]
-#     df.columns = ['name', 'session', 'caseArea', 'capacity', 'status', 'parcels',
-#                 'agriLandUseChangeDate', 'establishmentApprovalDate', 'landUseChangeDate', 'landUseChangeRegisDate',
-#                 'isAdjacent', 'isBuilding', 'isNearbyResident', 'isSensitive', 'isInner', 'isExplicit']
+#     df = df[["APPL", "SESS", "C_AREA", "CAP", "STAT", "PN",
+#             "ALUC_DT", "EA_DT", "LCC_DT", "LCR_DT", 
+#             "AJOC", "BLDG", "NBR", "ESA", "INR", "EXPLICIT"]]
+#     df.columns = ["name", "session", "caseArea", "capacity", "status", "parcels",
+#                 "agriLandUseChangeDate", "establishmentApprovalDate", "landUseChangeDate", "landUseChangeRegisDate",
+#                 "isAdjacent", "isBuilding", "isNearbyResident", "isSensitive", "isInner", "isExplicit"]
 
 #     def is_true(s):
-#         try:    return 'X' in s.lower()
+#         try:    return "X" in s.lower()
 #         except: return True
 
 #     def correct_dt(s):
@@ -64,19 +64,19 @@ def _connect_mongo(username=USERNAME,
 #         except:
 #             return pd.NaT
         
-#         return dt.datetime.strptime(f'{y}-{m}-{d}', '%Y-%m-%d')
+#         return dt.datetime.strptime(f"{y}-{m}-{d}", "%Y-%m-%d")
 
 #     df.agriLandUseChangeDate = df.agriLandUseChangeDate.apply(correct_dt)
 #     df.establishmentApprovalDate = df.establishmentApprovalDate.apply(correct_dt)
 #     df.landUseChangeDate = df.landUseChangeDate.apply(correct_dt)
 #     df.landUseChangeRegisDate = df.landUseChangeRegisDate.apply(correct_dt)
-#     df[['isAdjacent', 'isBuilding', 'isNearbyResident', 'isSensitive', 'isInner', 'isExplicit']] =\
-#         df[['isAdjacent', 'isBuilding', 'isNearbyResident', 'isSensitive', 'isInner', 'isExplicit']].apply(is_true)
-#     df.status = df.status.astype('category')
+#     df[["isAdjacent", "isBuilding", "isNearbyResident", "isSensitive", "isInner", "isExplicit"]] =\
+#         df[["isAdjacent", "isBuilding", "isNearbyResident", "isSensitive", "isInner", "isExplicit"]].apply(is_true)
+#     df.status = df.status.astype("category")
 
-#     gf = df.groupby(['name', 'session', "caseArea"]).agg( lambda x: ','.join(map(str, list(set(x)))) ).reset_index()
-#     gf.parcels = gf.parcels.apply(lambda x : x.split(','))
-#     appl_data = gf.to_dict('records')
+#     gf = df.groupby(["name", "session", "caseArea"]).agg( lambda x: ",".join(map(str, list(set(x)))) ).reset_index()
+#     gf.parcels = gf.parcels.apply(lambda x : x.split(","))
+#     appl_data = gf.to_dict("records")
 #     collection.insert_many(appl_data)
 
 # * connect to db
@@ -92,14 +92,14 @@ def _connect_mongo(username=USERNAME,
 
 def search_applicants_by_parcel(user_input: str,
                                 parcel: pymongo.collection.Collection):
-    _, district, section, number = user_input.split('\n')
+    _, district, section, number = user_input.split("\n")
     result = parcel.aggregate([
             {
                 "$match":{
                     "$and":[
-                        {"districtName": {"$regex": f'{district}'}},
-                        {"sectionName": f'{section}'},
-                        {"prcl": {"$regex": f'{number}'}}
+                        {"districtName": {"$regex": f"{district}"}},
+                        {"sectionName": f"{section}"},
+                        {"prcl": {"$regex": f"{number}"}}
                     ]
                 } 
             },
@@ -129,7 +129,7 @@ def search_applicants_by_parcel(user_input: str,
 
 def search_info_by_keywords(user_input: str,
                             applicant: pymongo.collection.Collection):
-    _, keyword = user_input.split('\n')
+    _, keyword = user_input.split("\n")
     result = applicant.aggregate([
     {
         "$match":{ 
@@ -151,5 +151,5 @@ def search_info_by_keywords(user_input: str,
     
     return result
 
-# pprint(list(search_applicants_by_parcel('查詢地號\n新營區\n後鎮段\n676', parcel)))
-# pprint(list(search_info_by_keywords('查詢關鍵字\n山', applicant)))
+# pprint(list(search_applicants_by_parcel("查詢地號\n新營區\n後鎮段\n676", parcel)))
+# pprint(list(search_info_by_keywords("查詢關鍵字\n山", applicant)))

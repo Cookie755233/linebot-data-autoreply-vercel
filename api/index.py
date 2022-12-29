@@ -12,14 +12,14 @@ line_handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 app = Flask(__name__)
 
 # domain root
-@app.route('/')
+@app.route("/")
 def home():
-    return 'Hello Cookie!'
+    return "Hello Cookie!"
 
-@app.route("/webhook", methods=['POST'])
+@app.route("/webhook", methods=["POST"])
 def callback():
     # get X-Line-Signature header value
-    signature = request.headers['X-Line-Signature']
+    signature = request.headers["X-Line-Signature"]
     # get request body as text
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
@@ -28,7 +28,7 @@ def callback():
         line_handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
-    return 'OK'
+    return "OK"
 
 
 @line_handler.add(MessageEvent, message=TextMessage)
@@ -38,7 +38,10 @@ def handle_message(event):
     
     # user_message = event.message.text
     # reply_message = read_user_message(user_message)
-    
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(event.message.text)
+        )
     line_bot_api.reply_message(
         event.reply_token,
         FlexSendMessage(reply_flex())

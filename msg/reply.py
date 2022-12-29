@@ -1,15 +1,18 @@
 
 import re
-
+from db.mongo import _connect_mongo, search_applicants_by_parcel
 
 def read_user_message(user_message: str):
-    if re.match('hello', user_message):
-        return 'Hi! what can i help'
+    if re.match("hello", user_message):
+        return "Hi! what can i help"
     
-    if re.match('bye', user_message):
-        return 'Cya!'
+    if re.match("bye", user_message):
+        return "Cya!"
 
-    if re.match('test', user_message):
-        return 
-    
-    return
+    if re.match("@地號", user_message):
+        parcel = _connect_mongo().ls.parcel
+        applicant_search_result = search_applicants_by_parcel(user_message, parcel)
+        return applicant_search_result
+
+    else:
+        return "wat"
