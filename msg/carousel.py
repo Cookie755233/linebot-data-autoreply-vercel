@@ -7,17 +7,18 @@ def create_bubble():
 
 
 def insert_body_contents_TITLE(bubble, 
-                               top,     #? 上標（綠字）
+                               top,     #? 上標（綠字/紅字）
                                title,   
-                               appendix 
+                               appendix,
+                               top_color="#46844f"
                                ):    
     bubble["body"]["contents"] += [
         {
             "type": "text",
             "text": top,
             "weight": "bold",
-            "color": "#46844f",
-            "size": "xs",
+            "color": top_color,
+            "size": "sm",
         },
         {
             "type": "text",
@@ -25,6 +26,7 @@ def insert_body_contents_TITLE(bubble,
             "weight": "bold",
             "size": "lg",
             "margin": "md",
+            "wrap": True
         },
         {
             "type": "text",
@@ -201,13 +203,14 @@ def insert_applicant_search_result(search_result, carousel_container):
         cap  = float(result['capacity'].replace(',', ''))
         area = float(result['caseArea'].replace(',', ''))
         stat = result['status']
-        
+        top_color = "#46844f" if stat == '已核准' else "#C28285"
         
         bubble = create_bubble()
         bubble = insert_body_contents_TITLE(bubble, 
                                             stat,
                                             name,
-                                            f"第 {sess} 次聯審會議")
+                                            f"第 {sess} 次聯審會議",
+                                            top_color=top_color)
         
             
         

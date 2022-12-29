@@ -1,20 +1,20 @@
-import re
-from pprint import pprint
+# import re
+# from pprint import pprint
 
-from linebot import LineBotApi, WebhookHandler
-# 載入對應的函式庫
-from linebot.models import (
-    TextSendMessage,
-    FlexSendMessage,
-)
+# from linebot import LineBotApi, WebhookHandler
+# # 載入對應的函式庫
+# from linebot.models import (
+#     TextSendMessage,
+#     FlexSendMessage,
+# )
 
-from msg.read import _is_valid_parcel
-from msg.carousel import *
-from utils.ls_search import *
+# from msg.read import _is_valid_parcel
+# from msg.carousel import *
+# from utils.ls_search import *
 
-line_bot_api = LineBotApi(
-    "cKElXBSd7IPz/OWxOhOxdtowD6S+1ApYDkbulNjtgWgvd5NBbcyAyO1bWqiStrR5ervVxbgtti/BN+JUPzeqxVspnOI72bjNlsAsO7jnBwR7qwn+PwDTzU/4xhKmhT0s58zcdh5dFOFxmzCJPKVCYAdB04t89/1O/w1cDnyilFU="
-)
+# line_bot_api = LineBotApi(
+#     "cKElXBSd7IPz/OWxOhOxdtowD6S+1ApYDkbulNjtgWgvd5NBbcyAyO1bWqiStrR5ervVxbgtti/BN+JUPzeqxVspnOI72bjNlsAsO7jnBwR7qwn+PwDTzU/4xhKmhT0s58zcdh5dFOFxmzCJPKVCYAdB04t89/1O/w1cDnyilFU="
+# )
 
 # user_message = "地號\n七股區\n七股段\n445-10"
 
@@ -47,10 +47,3 @@ line_bot_api = LineBotApi(
 #     return CAROUSEL_CONTAINER
 
 
-CAROUSEL_CONTAINER = {"type": "carousel", "contents": []}
-insert_applicant_search_result(list(search_info_by_applicant('99號場')), CAROUSEL_CONTAINER)
-pprint(CAROUSEL_CONTAINER)
-
-CAROUSEL_CONTAINER = {"type": "carousel", "contents": []}
-insert_parcel_search_result(list(search_applicants_by_parcel('七股區','七股段','353-13')), CAROUSEL_CONTAINER)
-pprint(CAROUSEL_CONTAINER)
