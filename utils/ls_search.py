@@ -7,7 +7,7 @@ def search_applicants_by_parcel(district, section, number,
             {
                 "$match":{
                     "$and":[
-                        {"districtName": {"$regex": f"{district}"}},
+                        {"distc rictName": {"$regex": f"{district}"}},
                         {"sectionName": f"{section}"},
                         {"prcl": {"$regex": f"{number}"}}
                     ]
