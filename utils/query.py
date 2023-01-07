@@ -7,11 +7,11 @@ from db._connect import _connect_mongo
 USE_DATABASE = _connect_mongo().reip
 
 def search_keyword(keyword: str, 
-                   db: Database = USE_DATABASE,
+                   db: Database=USE_DATABASE,
                    nearby=False,
                    maxDistance=100, 
                    limit=0) -> list:
-    
+    print(db)
     pipeline = _search_keyword(keyword,
                                maxEdits=1,
                                min_searchScore=1,

@@ -74,5 +74,4 @@ from msg.read import read_messages
 # from msg.reply import reply_applicant_search_results
 # r = search_keyword('和立聯合科技股份有限公司', db=con().reip, limit=2)
 # pprint(reply_applicant_search_results(r))
-pprint(read_messages('@查詢\n公雞叫'))
-
+# read_messages('@查詢\n公雞')

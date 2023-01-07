@@ -24,13 +24,14 @@ def read_messages(user_message: str):
     nearby, maxDistance = _kwargs_parser(kwargs)
     
     if operator == '@查詢':
-        results = search_keyword(keyword, nearby, maxDistance)
+        print(keyword, nearby, maxDistance)
+        results = search_keyword(keyword=keyword,nearby=nearby, maxDistance=maxDistance)
         if not results:
             return 300, None
         return 201, results
     
     if operator == '@查詢地號':
-        results = search_parcel(keyword, nearby, maxDistance)
+        results = search_parcel(keyword=keyword,nearby=nearby, maxDistance=maxDistance)
         if not results:
             return 300, None
         return 202, results
