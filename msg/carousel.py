@@ -1,30 +1,28 @@
 
-CONTAINER = {"type": "carousel", "contents": []}
-BUBBLE = {
-    "type": "bubble",
-    "body": {
-        "type": "box",
-        "layout": "vertical", 
-        "contents": []
-        },
-    "footer": {
-        "type": "box",
-        "layout": "vertical",
-        "contents": [],
-        "spacing": "sm"
-    }
-}
 
 class Carousel:
-    def __init__(self, container=CONTAINER) -> None:
-        self.container = container
+    def __init__(self) -> None:
+        self.container = {"type": "carousel", "contents": []}
     
     def insert_bubble(self, bubble):
         self.container["contents"].append(bubble)
         
 class Bubble:
-    def __init__(self, bubble=BUBBLE) -> None:
-        self.bubble = bubble
+    def __init__(self) -> None:
+        self.bubble = {
+                "type": "bubble",
+                "body": {
+                    "type": "box",
+                    "layout": "vertical", 
+                    "contents": []
+                    },
+                "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [],
+                    "spacing": "sm"
+                }
+            }
 
     def insert_body_contents_TITLE(self, 
                                    status,          #* 上標（綠字:核准/ 紅字:else）
@@ -50,7 +48,7 @@ class Bubble:
             {
                 "type": "text",
                 "text": appendix,
-                "size": "xs",
+                "size": "xxs",
                 "color": "#aaaaaa",
                 "wrap": True,
             },
@@ -61,8 +59,6 @@ class Bubble:
                                   subtitle,     #* subtitle
                                   *args         #* must have both key & val, or it stops
                                   ):
-        
-        
         args = list(args)
         items = []
         for key, val in _pairwise(args):
@@ -102,7 +98,7 @@ class Bubble:
                     {
                         "type": "text",
                         "text": key,
-                        "size": "xs",
+                        "size": "xxs",
                         "color": "#aaaaaa",
                         "flex": 0,
                     },

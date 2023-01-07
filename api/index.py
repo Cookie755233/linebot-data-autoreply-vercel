@@ -106,8 +106,8 @@ def handle_postback(event):
             LocationSendMessage(
                 title = "TITLE",
                 address = "ADDRESS",
-                latitude = longitude,
-                longitude = latitude
+                latitude = float(longitude),
+                longitude = float(latitude)
                 )
             )   
 
