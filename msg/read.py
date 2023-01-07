@@ -23,30 +23,45 @@ def read_messages(user_message: str):
     operator, keyword, *kwargs = user_message.lower().replace('＠', '@').splitlines()
     nearby, maxDistance = _kwargs_parser(kwargs)
     
-    #? <--  search for the user queries -->
-    match operator:
-        case '@查詢':
-            results = search_keyword(keyword, nearby, maxDistance)
-            if not results:
-                return 300, None
-            return 201, results
-        
-        case '@查詢地號':
-            results = search_parcel(keyword, nearby, maxDistance)
-            if not results:
-                return 300, None
-            return 202, results
-        
-        #TODO
-        case '@統計申請人':
-            return 
-        
-        case '@統計':
-            return
-        
-        case _: 
-            return
+    if operator == '@查詢':
+        results = search_keyword(keyword, nearby, maxDistance)
+        if not results:
+            return 300, None
+        return 201, results
     
+    if operator == '@查詢地號':
+        results = search_parcel(keyword, nearby, maxDistance)
+        if not results:
+            return 300, None
+        return 202, results
+    
+
+    #! cannot use 3.10 yet?!
+    # #? <--  search for the user queries -->
+    # match operator:
+    #     case '@查詢':rd, nearby, maxDistance)
+    #         if not results:
+    #         results = search_keyword(keywo
+    #             return 300, None
+    #         return 201, results
+        
+    #     case '@查詢地號':
+    #         results = search_parcel(keyword, nearby, maxDistance)
+    #         if not results:
+    #             return 300, None
+    #         return 202, results
+        
+    #     #TODO
+    #     case '@統計申請人':
+    #         return 
+        
+    #     case '@統計':
+    #         return
+        
+    #     case _: 
+    #         return
+    #! the fuck 
+
     
     
 def _kwargs_parser(kwargs: list): #! kwargs is "LIST"
