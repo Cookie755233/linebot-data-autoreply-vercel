@@ -106,7 +106,7 @@ class Bubble:
                         "type": "text",
                         "text": val,
                         "color": "#aaaaaa",
-                        "size": "xs",
+                        "size": "xxs",
                         "align": "end",
                     },
                 ],
