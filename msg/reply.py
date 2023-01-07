@@ -1,6 +1,7 @@
 
 from msg.carousel import Carousel, Bubble
 
+import re
 
 def reply_applicant_search_results(results):
     carousel = Carousel()
@@ -39,7 +40,10 @@ def reply_applicant_search_results(results):
         bubble.insert_body_contents_SEP()
         bubble.insert_body_contents_FOOTER('ID', f'{ersn} / {prsn}')
         bubble.insert_footer_contents_BOTTON(lng, lat)
-
+        print(
+            list(map(float, re.findall(
+                r'[0-9]*[.]?[0-9]+', f"location: {lng}, {lat}")))
+        )
         carousel.insert_bubble(bubble.bubble)
 
     return carousel.container

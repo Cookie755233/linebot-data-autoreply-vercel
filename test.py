@@ -1,28 +1,28 @@
 
-# from db._parcel_handler import reip_to_geojson
-# from db._reip_handler import reip_to_json
-# from db._connect import _connect_mongo
-# from db._pandas_util import reip_readfile
-# from utils._pipeline import _search_keyword, _search_nearby, _search_parcel
+from db._parcel_handler import reip_to_geojson
+from db._reip_handler import reip_to_json
+from db._connect import _connect_mongo
+from db._pandas_util import reip_readfile
+from utils._pipeline import _search_keyword, _search_nearby, _search_parcel
 
-# from pprint import pprint
+from pprint import pprint
 
-# def mainf():
-#     df = reip_readfile('/Users/cookie/Desktop/prcl_.csv', 'pr')
-#     edf = reip_readfile('/Users/cookie/Documents/Work/494計畫/陽光電城資訊網/案場介接/設備登記/RAWDATA/設備登記總表_2022120700.xlsx', 'er')
+def mainf():
+    df = reip_readfile('/Users/cookie/Desktop/prcl_.csv', 'pr')
+    edf = reip_readfile('/Users/cookie/Documents/Work/494計畫/陽光電城資訊網/案場介接/設備登記/RAWDATA/設備登記總表_2022120700.xlsx', 'er')
 
-#     j = reip_to_json(df, edf)
+    j = reip_to_json(df, edf)
 
-#     return j
+    return j
 
 
-# def mainp():
-#     df = reip_readfile('/Users/cookie/Desktop/prcl_.csv', 'parcel')
-#     return reip_to_geojson(df)
+def mainp():
+    df = reip_readfile('/Users/cookie/Desktop/prcl_.csv', 'parcel')
+    return reip_to_geojson(df)
 
-# def con():
-#     client = _connect_mongo('cookie', 'Cokie7523')
-#     return client
+def con():
+    client = _connect_mongo('cookie', 'Cokie7523')
+    return client
 
 # import numpy as np
 # def q(applicants=con().reip.applicants):
@@ -68,11 +68,12 @@
     
 #     pprint(len(p2na))
 
-# from msg.read import read_messages
-# from msg.read import search_keyword
-# from msg.reply import reply_applicant_search_results
-# r = search_keyword('國小', db=con().reip, limit=5)
+from msg.read import read_messages
+from msg.read import search_keyword
+from msg.reply import reply_applicant_search_results
+r = search_keyword('國小', db=con().reip)
+reply_applicant_search_results(r)
 # pprint(
 #     reply_applicant_search_results(r)
-#     )
+    # )
 
