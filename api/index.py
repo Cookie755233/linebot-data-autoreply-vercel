@@ -97,7 +97,7 @@ def handle_message(event):
 
 @line_handler.add(PostbackEvent)
 def handle_postback(event):
-    if event.postback.data.startsWith('location'):
+    if event.postback.data.startswith('location'):
         longitude, latitude = re.findall(
             r'[0-9]*[.]?[0-9]+', event.postback.data)
         
