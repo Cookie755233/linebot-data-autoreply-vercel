@@ -51,89 +51,49 @@ def handle_message(event):
     user_message = event.message.text
     status, return_value = read_messages(user_message)
     
-    match status:
-        #? found something, return flex message
-        case 201: 
-            flex_message = reply_applicant_search_results(return_value)
-            line_bot_api.reply_message(
-                event.reply_token,
-                FlexSendMessage(alt_text="Search results", 
-                                contents=flex_message))
-            
-        case 202: 
-            return
-        
-        #@ make tutorial flex message on how to use the app when raised errors
-        #? found nothing, return THINGS_NOT_FOUND_ERROR
-        case 301:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextMessage(ERROR_MESSAGE.APPLICANT_NOT_FOUND_ERROR))
-        case 302: 
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextMessage(ERROR_MESSAGE.PARCEL_NOT_FOUND_ERROR))
-        #? user input incorrect, return USER_INPUT_ERROR
-        case 400:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextMessage(ERROR_MESSAGE.USER_INPUT_ERROR))
-        
-        #? else, or bugs 
-        case _:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextMessage('haha in development'))
+    if status == 201:
+        flex_message = reply_applicant_search_results(return_value)
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage(alt_text="Search results", 
+                            contents=flex_message))
     
-    # if re.match("查詢地號", user_message):
-    #     if not len(user_message.split('\n')) == 4:
-    #         reply_message = CONST.PARCEL_NOT_FOUND_ERROR
+    #! cannot use 3.10 yet?!
+    # match status:
+    #     #? found something, return flex message
+    #     case 201: 
+    #         flex_message = reply_applicant_search_results(return_value)
     #         line_bot_api.reply_message(
-    #             event.reply_token, 
-    #             TextSendMessage(reply_message))
-    #         return
+    #             event.reply_token,
+    #             FlexSendMessage(alt_text="Search results", 
+    #                             contents=flex_message))
             
-    #     carousel_container = {"type": "carousel", "contents": []}
-    #     _, district, section, parcel = user_message.split("\n")
-    #     result = list(search_applicants_by_parcel(district, section, parcel))
+    #     case 202: 
+    #         return
+        
+    #     #@ make tutorial flex message on how to use the app when raised errors
+    #     #? found nothing, return THINGS_NOT_FOUND_ERROR
+    #     case 301:
+    #         line_bot_api.reply_message(
+    #             event.reply_token,
+    #             TextMessage(ERROR_MESSAGE.APPLICANT_NOT_FOUND_ERROR))
+    #     case 302: 
+    #         line_bot_api.reply_message(
+    #             event.reply_token,
+    #             TextMessage(ERROR_MESSAGE.PARCEL_NOT_FOUND_ERROR))
+    #     #? user input incorrect, return USER_INPUT_ERROR
+    #     case 400:
+    #         line_bot_api.reply_message(
+    #             event.reply_token,
+    #             TextMessage(ERROR_MESSAGE.USER_INPUT_ERROR))
+        
+    #     #? else, or bugs 
+    #     case _:
+    #         line_bot_api.reply_message(
+    #             event.reply_token,
+    #             TextMessage('haha in development'))
+    #! the fuck 
 
-    #     if not result:
-    #         reply_message = f"查無「{district}{section}{parcel}地號」資料!"
-    #         line_bot_api.reply_message(
-    #             event.reply_token, 
-    #             TextSendMessage(reply_message))
-    #         return
-            
-    #     insert_parcel_search_result(result, carousel_container)
-    #     line_bot_api.reply_message(
-    #         event.reply_token,
-    #         FlexSendMessage(alt_text="Search results", 
-    #                         contents=carousel_container))
-        
-    # if re.match("查詢申請人", user_message):
-    #     if len(user_message.split('\n')) != 2: 
-    #         reply_message = CONST.APPLICANT_NOT_FOUND_ERROR
-    #         line_bot_api.reply_message(
-    #             event.reply_token, 
-    #             TextSendMessage(reply_message))
-    #         return
-        
-    #     carousel_container = {"type": "carousel", "contents": []}
-    #     _, name = user_message.split('\n')
-        
-    #     result = list(search_info_by_applicant(name))
-    #     if not result:
-    #             reply_message = f"查無「{name}」資料!"
-    #             line_bot_api.reply_message(
-    #                 event.reply_token, 
-    #                 TextSendMessage(reply_message))
-    #             return
-        
-    #     insert_applicant_search_result(result, carousel_container)
-    #     line_bot_api.reply_message(
-    #         event.reply_token,
-    #         FlexSendMessage(alt_text="Search results", 
-    #                         contents=carousel_container))
 
 @line_handler.add(PostbackEvent)
 def handle_postback(event):
