@@ -1,20 +1,15 @@
 
-# class Pipeline:
-#     def __init__(self) -> None:
-#         self.pipeline = []
-    
-#     def add_stage(self, stage: dict) -> None:
-#         self.pipeline.append(stage)
-
+from utils.helper import pairwise
 
 class StageOperator:
     def geo_near(self,
-                type='Point',
-                coordinates=[0, 0], 
-                distanceField='distance',
-                maxDistance=100,
-                query={},
-                spherical=True) -> dict:
+                 coordinates=[0, 0], 
+                 maxDistance=100,
+                 
+                 type='Point',
+                 distanceField='distance',
+                 query={},
+                 spherical=True) -> dict:
         return\
         {
             '$geoNear': {
@@ -22,7 +17,7 @@ class StageOperator:
                     'type': 'Point', 
                     'coordinates': coordinates
                 }, 
-                'distanceField': 'dist', 
+                'distanceField': distanceField, 
                 'maxDistance': maxDistance, 
                 'query': {}, 
                 'spherical': True
@@ -30,6 +25,23 @@ class StageOperator:
         }
 
 
+    def lookup(self,
+               from_,
+               local_field,
+               foreign_field,
+               as_
+               ):
+        return\
+        {
+            '$lookup': {
+                "from": from_,
+                "localField": local_field,
+                "foreignField": foreign_field,
+                "as": as_
+            }
+        }
+    
+    
     def text_search(self,
                     query: str,
                     path: list[str],
@@ -61,12 +73,17 @@ class StageOperator:
         }
         
     def match(self,
-              field: str,
-              expression: dict):
+              *expressions):
+        
+        expressions = list(expressions)
+        match_items = []
+        for key, val in pairwise(expressions):
+            match_items.append({key: val})
+        
         return\
         {
-            '$match': {
-                field : expression
+        '$match': {
+            '$and': match_items
             }
         }
     
@@ -78,7 +95,6 @@ class StageOperator:
     def limit(self, 
               limit: int):
         return { '$limit': limit }
-
 
 
 

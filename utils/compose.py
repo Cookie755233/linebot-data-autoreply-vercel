@@ -56,15 +56,15 @@ def compose_keyword_nearby_results(results):
         if i >= 11: break
         
         appl   = applicant["applicantName"]
-        addr   = applicant['address'] if isinstance(applicant['address'], str) else '-'
         res    = applicant['result']
         stat   = applicant['status']
         stat_color = "#46844f" if res == '核准' else "#C28285"
+        geo_result_cnt = len(geo_results)
         
         bubble = Bubble()
         bubble.insert_body_contents_TITLE(f'{res} - {stat}', 
                                           appl,
-                                          f'地址: {addr}',
+                                          f'共找到 {geo_result_cnt} 筆鄰近案場',
                                           top_color=stat_color)
         
         for j, result in enumerate(geo_results):
@@ -75,10 +75,15 @@ def compose_keyword_nearby_results(results):
             s = result['status']
             c = result['totalCapacity']
             a = result['landArea']
-            bubble.insert_body_contents_ITEM(f'{j}. {n}',
+            d = result['distance']
+            
+            clr = "#46844f" if r == '核准' else "#C28285"
+            bubble.insert_body_contents_ITEM(f'{j+1}. {n}',
                                          '設置類型', f'{p} - {t}',
-                                         '案件狀態', f'{r} - {s}'
+                                         '案件狀態', f'{r} - {s}',
                                          '面積/容量', f'{a:,.0f} M2 / {c:,.0f} kW',
+                                         '距離', f'{d} 公尺'
+                                         subtitle_color=clr,
                                          size='xxs')
             
             if j+1 != len(geo_results):

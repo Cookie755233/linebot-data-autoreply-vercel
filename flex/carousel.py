@@ -1,4 +1,5 @@
 
+from utils.helper import pairwise
 
 class Carousel:
     def __init__(self) -> None:
@@ -28,27 +29,32 @@ class Bubble:
                                    status,          #* 上標（綠字:核准/ 紅字:else）
                                    title,
                                    appendix,
-                                   top_color='#46844f'):
+                                   top_color='#46844f',
+                                   title_color="#000000",
+                                   top_size='sm',
+                                   title_size='lg',
+                                   appendix_size='xxs'):
         self.bubble["body"]["contents"] += [
             {
                 "type": "text",
                 "text": status,
                 "weight": "bold",
                 "color": top_color,
-                "size": "sm",
+                "size": top_size,
             },
             {
                 "type": "text",
                 "text": title,
                 "weight": "bold",
-                "size": "lg",
+                "size": title_size,
                 "margin": "md",
-                "wrap": True
+                "wrap": True,
+                "color": title_color
             },
             {
                 "type": "text",
                 "text": appendix,
-                "size": "xxs",
+                "size": appendix_size,
                 "color": "#aaaaaa",
                 "wrap": True,
             },
@@ -57,13 +63,15 @@ class Bubble:
     
     def insert_body_contents_ITEM(self,
                                   subtitle,     #* subtitle
-                                  *args,        #* must have both key & val, or it stops
-                                  size='sm'
+                                  *args,        #* must have paired key & val, or will raise StopIteration
+                                  subtitle_size='md',
+                                  subtitle_color='#46844f',
+                                  item_size='sm', 
                                   ):
         args = list(args)
         items = []
-        for key, val in _pairwise(args):
-            items.append(_create_box(key, val, size=size))
+        for key, val in pairwise(args):
+            items.append(_create_box(key, val, size=item_size))
         
         self.bubble["body"]["contents"] += [
             {
@@ -76,9 +84,9 @@ class Bubble:
                     {
                         "type": "text",
                         "text": subtitle,
-                        "size": "md",
+                        "size": subtitle_size,
                         "weight": "bold",
-                        "color": "#46844f",
+                        "color": subtitle_color
                     },
                     #? <-- items -->
                     *items
@@ -158,13 +166,6 @@ def _create_box(key, val, size='sm') -> dict:
     }
 
 
-def _pairwise(iterator):
-    it = iter(iterator)
-    while True:
-        try:
-            yield next(it), next(it)
-        except StopIteration:   # no more elements in the iterator
-            return
 
 # #! <===== deprecated =====>
 # #? <-- create bubble container --> 

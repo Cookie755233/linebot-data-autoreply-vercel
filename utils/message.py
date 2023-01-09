@@ -1,13 +1,13 @@
 
-from utils.query import search_keyword, search_parcel
+from utils.query import search_applicants, search_parcels
 import re
 
 
 def inspect_user_message(user_message: str):
     '''            
     REQUIRED:
-        - @查詢地號           / @查詢
-        - (.*區)(.*段)(.*號)  / 申請人
+        - @查詢地號           or   @查詢
+        - (.*區)(.*段)(.*號)  or   申請人
     
     OPTIONAL:
         - #鄰近ＯＯ[公尺|米|公里|m|km]
@@ -31,14 +31,14 @@ def inspect_user_message(user_message: str):
     
     config = Config()
     
-    operator, keyword, *configs = message_lists
+    operator, query, *configs = message_lists
     config.parse(configs)
         
-    #? <-- use search_keyword -->
+    #? <-- search `applicants` colleciton -->
     if operator == '@查詢':
-        results = search_keyword(keyword=keyword, 
-                                 nearby=config.nearby,
-                                 maxDistance=config.maxDistance, 
+        results = search_applicants(query=query, 
+                                    nearby=config.nearby,
+                                    maxDistance=config.maxDistance, 
                                 #  selectDistrict=config.selectDistrict,
                                 #  selectSection=config.selectSection, 
                                 #  selectResult=config.selectResult
@@ -48,14 +48,26 @@ def inspect_user_message(user_message: str):
         return 201+config.nearby, results
     
     
-    #? <-- use search_parcel -->
+    #? <-- search `parcels` collection -->
     if operator == '@查詢地號':
-        results = search_parcel(keyword=keyword,
-                                nearby=config.nearby,
-                                maxDistance=config.maxDistance)
+        try:
+            district, section, prcl = re.findall(
+                r'(.*區)(.*段)(\d{1,4}-?\d{0,4})地?號?', query)[0]
+        except ValueError:
+            return (400, )
+     
+        results = search_parcels(district=district, 
+                                 section=section,
+                                 prcl=prcl,
+                                 nearby=config.nearby,
+                                 maxDistance=config.maxDistance
+                                #  selectDistrict=config.selectDistrict,
+                                #  selectSection=config.selectSection, 
+                                #  selectResult=config.selectResult
+                                 )
         if not results:
-            return 302, None
-        return 202, results
+            return 302+config.nearby, None
+        return 202+config.nearby, results
     
     
     
