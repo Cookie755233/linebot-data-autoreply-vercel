@@ -69,7 +69,11 @@ def con():
 
 from utils.query import search_parcels
 from pprint import pprint
+from utils.compose import compose_parcel_nearby_results
 
-
-pprint(list(search_parcels('七股區', '七股段', '10',
-                           nearby=False, db=con().reip)))
+pprint(
+    compose_parcel_nearby_results(
+    search_parcels('七股區', '七股段', '10',
+                           nearby=True, db=con().reip, 
+                           limit=1, maxDistance=1000))
+)

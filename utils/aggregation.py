@@ -96,8 +96,11 @@ class StageOperator:
               limit: int):
         return { '$limit': limit }
 
+    def regex(self, pattern):
+        return { '$regex': pattern }
 
 
+        
 # def __geoNear(x: float, 
 #             y: float,
 #             maxDistance: float=100.0) -> list[dict]:

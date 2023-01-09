@@ -66,8 +66,8 @@ def inspect_user_message(user_message: str):
                                 #  selectResult=config.selectResult
                                  )
         if not results:
-            return 302+config.nearby, None
-        return 202+config.nearby, results
+            return 303+config.nearby, None
+        return 203+config.nearby, results
     
     
     

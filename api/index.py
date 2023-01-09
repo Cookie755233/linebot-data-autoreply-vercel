@@ -8,7 +8,10 @@ from linebot.models import (
     TextMessage, TextSendMessage, FlexSendMessage, LocationSendMessage
 )
 from utils.message import inspect_user_message
-from utils.compose import compose_keyword_results, compose_keyword_nearby_results
+from utils.compose import (
+    compose_applicant_results, compose_applicant_nearby_results,
+    compose_parcel_results, compose_parcel_nearby_results
+)
 
 import const.error as ERROR_MESSAGE
 
@@ -48,54 +51,37 @@ def handle_message(event):
     status, return_value = inspect_user_message(user_message)
     
     if status == 201:
-        flex_message = compose_keyword_results(return_value)
+        flex_message = compose_applicant_results(return_value)
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage(alt_text="Search results", 
                             contents=flex_message))
     if status == 202:
-        flex_message = compose_keyword_nearby_results(return_value)
+        flex_message = compose_applicant_nearby_results(return_value)
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage(alt_text="Search results", 
                             contents=flex_message))
-    
-    #! cannot use 3.10 yet?!
-    # match status:
-    #     #? found something, return flex message
-    #     case 201: 
-    #         flex_message = reply_applicant_search_results(return_value)
-    #         line_bot_api.reply_message(
-    #             event.reply_token,
-    #             FlexSendMessage(alt_text="Search results", 
-    #                             contents=flex_message))
-            
-    #     case 202: 
-    #         return
-        
-    #     #@ make tutorial flex message on how to use the app when raised errors
-    #     #? found nothing, return THINGS_NOT_FOUND_ERROR
-    #     case 301:
-    #         line_bot_api.reply_message(
-    #             event.reply_token,
-    #             TextMessage(ERROR_MESSAGE.APPLICANT_NOT_FOUND_ERROR))
-    #     case 302: 
-    #         line_bot_api.reply_message(
-    #             event.reply_token,
-    #             TextMessage(ERROR_MESSAGE.PARCEL_NOT_FOUND_ERROR))
-    #     #? user input incorrect, return USER_INPUT_ERROR
-    #     case 400:
-    #         line_bot_api.reply_message(
-    #             event.reply_token,
-    #             TextMessage(ERROR_MESSAGE.USER_INPUT_ERROR))
-        
-    #     #? else, or bugs 
-    #     case _:
-    #         line_bot_api.reply_message(
-    #             event.reply_token,
-    #             TextMessage('haha in development'))
-    #! the fuck 
 
+    if status == 203:
+        flex_message = compose_parcel_results(return_value)
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage(alt_text="Search results", 
+                            contents=flex_message))
+
+    if status == 204:
+        flex_message = compose_parcel_nearby_results(return_value)
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage(alt_text="Search results", 
+                            contents=flex_message))
+
+    if status == 400:
+        line_bot_api.reply_message(
+            event.reply_token, 
+            TextSendMessage(ERROR_MESSAGE.USER_INPUT_ERROR)
+        )
 
 @line_handler.add(PostbackEvent)
 def handle_postback(event):
