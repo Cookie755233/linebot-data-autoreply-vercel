@@ -52,7 +52,7 @@ def compose_keyword_results(results):
 def compose_keyword_nearby_results(results):
     #! [ ({applicants}, {geo_results}), ... ]
     carousel = Carousel()
-    for i, (applicant, geo_results) in results:
+    for i, (applicant, geo_results) in enumerate(results):
         if i >= 11: break
         
         appl   = applicant["applicantName"]
@@ -75,7 +75,7 @@ def compose_keyword_nearby_results(results):
             s = result['status']
             c = result['totalCapacity']
             a = result['landArea']
-            bubble.insert_body_contents_ITEM(n,
+            bubble.insert_body_contents_ITEM(f'{j}. {n}',
                                          '設置類型', f'{p} - {t}',
                                          '案件狀態', f'{r} - {s}'
                                          '面積/容量', f'{a:,.0f} M2 / {c:,.0f} kW',
