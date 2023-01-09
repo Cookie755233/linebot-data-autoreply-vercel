@@ -32,7 +32,7 @@ class StageOperator:
 
     def text_search(self,
                     query: str,
-                    path: str | list[str],
+                    path: list[str],
                     index='keyword_index',
                     maxEdits=1):
         
