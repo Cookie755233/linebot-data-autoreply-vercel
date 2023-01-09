@@ -82,7 +82,7 @@ def compose_applicant_nearby_results(results):
                                          '面積/容量', f'{a:,.0f} M2 / {c:,.0f} kW',
                                          '距離', f'{d} 公尺',
                                          subtitle_color=clr,
-                                         size='xxs')
+                                         item_size='xxs')
             
             if j+1 != len(geo_results):
                 bubble.insert_body_contents_SEP()
@@ -139,6 +139,7 @@ def compose_parcel_results(results):
 
         bubble.insert_footer_contents_BOTTON(lng, lat)
 
+    carousel.insert_bubble(bubble.bubble)
     return carousel.container
 
 
@@ -160,6 +161,10 @@ def compose_parcel_nearby_results(results):
             f'{luz} - {lut}' #TODO maybe add "within how many distance"-> how to pass param into func??
             )
         
+        if not geo_results:
+            bubble.insert_body_contents_ITEM('無鄰近案場', subtitle_color='#C28285')
+
+
         for j, geo_result in enumerate(geo_results):
             n = geo_result['applicantName']
             p = geo_result['position']
@@ -182,6 +187,8 @@ def compose_parcel_nearby_results(results):
             
             if j+1 != len(geo_results):
                 bubble.insert_body_contents_SEP()
+
+        bubble.insert_footer_contents_BOTTON(lng, lat)
 
         carousel.insert_bubble(bubble.bubble)
 
