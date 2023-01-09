@@ -64,7 +64,7 @@ class Config:
     UNIT = {'公尺': 1, '米': 1, 'm': 1, '': 1, '公里': 1000, 'km': 1000}
     RESULT = ["#全文檢還", "#審查中", "#撤件", "#核准", "#補正", "#駁回"]
     def __init__(self, 
-                 nearby=None, 
+                 nearby=False, 
                  maxDistance=None, 
                  selectDistrict=None,
                  selectSection=None, 
