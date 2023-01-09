@@ -3,7 +3,7 @@ from utils.query import search_keyword, search_parcel
 import re
 
 
-def handle_message(user_message: str):
+def inspect_user_message(user_message: str):
     '''            
     REQUIRED:
         - @查詢地號           / @查詢
