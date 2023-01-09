@@ -37,7 +37,7 @@ def inspect_user_message(user_message: str):
     #? <-- use search_keyword -->
     if operator == '@查詢':
         results = search_keyword(keyword=keyword, 
-                                 nearby=config.neaby,
+                                 nearby=config.nearby,
                                  maxDistance=config.maxDistance, 
                                 #  selectDistrict=config.selectDistrict,
                                 #  selectSection=config.selectSection, 
