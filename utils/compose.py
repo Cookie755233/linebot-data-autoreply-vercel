@@ -106,7 +106,7 @@ def compose_parcel_results(results):
         bubble = Bubble()
 
         bubble.insert_body_contents_TITLE(
-            f'第 {i+1} 筆近似地號'
+            f'第 {i+1} 筆近似地號',
             f'{parcel_string}號',
             f'{luz} - {lut}'
             )
