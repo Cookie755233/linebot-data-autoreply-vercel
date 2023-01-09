@@ -7,14 +7,10 @@ from linebot.models import (
     MessageEvent, PostbackEvent,
     TextMessage, TextSendMessage, FlexSendMessage, LocationSendMessage
 )
-from msg.carousel import *
-from utils.ls_search import search_applicants_by_parcel, search_info_by_applicant
-from msg.read import read_messages
-from msg.reply import reply_applicant_search_results
-from msg.carousel import Carousel
+from utils.message import handle_message
+from utils.compose import compose_keyword_results, compose_keyword_nearby_results
 
-import msg._error_messages as ERROR_MESSAGE
-
+import const.error as ERROR_MESSAGE
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 line_handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
@@ -49,10 +45,16 @@ def handle_message(event):
         return
 
     user_message = event.message.text
-    status, return_value = read_messages(user_message)
+    status, return_value = handle_message(user_message)
     
     if status == 201:
-        flex_message = reply_applicant_search_results(return_value)
+        flex_message = compose_keyword_results(return_value)
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage(alt_text="Search results", 
+                            contents=flex_message))
+    if status == 202:
+        flex_message = compose_keyword_nearby_results(return_value)
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage(alt_text="Search results", 
@@ -113,3 +115,4 @@ def handle_postback(event):
 
 if __name__ == "__main__":
     app.run(debug=True)
+

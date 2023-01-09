@@ -1,8 +1,10 @@
 
-from pymongo.collection import Collection
 
-def _search_nearby(x: float, y: float,
-                   maxDistance=1000) -> list[set]:
+
+
+def add_geonear_stage(x: float, 
+                       y: float,
+                       maxDistance: float=100.0) -> list[set]:
     stage = [
         {
             '$geoNear': {
@@ -21,10 +23,10 @@ def _search_nearby(x: float, y: float,
     return stage
 
 
-def _search_keyword(keyword: str, 
-                    maxEdits=2,
-                    min_searchScore=1, 
-                    limit=0) -> list[set]:
+def add_keyword_search_stage(keyword: str,
+                              maxEdits: int=2,
+                              min_searchScore: int=1, 
+                              limit: int=0) -> list[set]:
     stage = [
         {
             '$search': {

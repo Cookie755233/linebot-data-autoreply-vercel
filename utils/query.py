@@ -1,34 +1,47 @@
 
 from pymongo.database import Database
 
-from utils._pipeline import _search_keyword, _search_nearby, _search_parcel
+from utils.aggregation import StageOperator
 from db._connect import _connect_mongo
 
+
+so = StageOperator()
 USE_DATABASE = _connect_mongo().reip
 
 def search_keyword(keyword: str, 
+                   min_searchScore=1,
+                   
                    nearby=False,
                    maxDistance=100, 
+                   
                    limit=0,
                    db: Database=USE_DATABASE,
+                   deafult_searchScore_name = 'searchScore'
                    ) -> list:
 
-    pipeline = _search_keyword(keyword,
-                               maxEdits=1,
-                               min_searchScore=1,
-                               limit=limit)
-
+        
+    pipeline = [
+        so.text_search(query=keyword, path=['applicantName'], index='keyword_index', maxEdits=1),
+        so.set_field(field=deafult_searchScore_name, expression={'$meta': deafult_searchScore_name}),
+        so.match(field=deafult_searchScore_name, expression={ '$gt': min_searchScore }),
+        so.sort(field=deafult_searchScore_name),
+    ]
+    
+    if limit: 
+        pipeline.append(so.limit(2))
     search_results = list(db.applicants.aggregate(pipeline))
-    #? nearby not required
+    
+    #? if nearby not required
     if not nearby: 
         return search_results #! [ {applicants}, ... ]
     
-    
-    #? users wants all the cases nearby
+    #? if to get all nearby applicants
     applicant_to_nearby_applicants = []
     for item in search_results:
         x, y = item['center']['coordinates']
-        geo_pipeline = _search_nearby(x, y, maxDistance=maxDistance)
+        geo_pipeline = [
+            so.geo_near(coordinates=[x, y], maxDistance=maxDistance)
+        ]
         geo_results = list(db.applicants.aggregate(geo_pipeline))
         applicant_to_nearby_applicants.append( (item, geo_results) )
 

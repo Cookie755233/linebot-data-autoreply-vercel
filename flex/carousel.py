@@ -57,12 +57,13 @@ class Bubble:
     
     def insert_body_contents_ITEM(self,
                                   subtitle,     #* subtitle
-                                  *args         #* must have both key & val, or it stops
+                                  *args,        #* must have both key & val, or it stops
+                                  size='sm'
                                   ):
         args = list(args)
         items = []
         for key, val in _pairwise(args):
-            items.append(_create_box(key, val))
+            items.append(_create_box(key, val, size=size))
         
         self.bubble["body"]["contents"] += [
             {
@@ -127,14 +128,14 @@ class Bubble:
                 "action": {
                     "type": "postback",
                     "label": "取得位置資訊",
-                    "data": f"location: {longitude}, {latitude}", #@ hmm
+                    "data": f"location: {longitude}, {latitude}",
                     "displayText": "取得位置資訊"
                 },
             }
         )
 
 
-def _create_box(key, val) -> dict:
+def _create_box(key, val, size='sm') -> dict:
     return {
         "type": "box",
         "layout": "horizontal",
@@ -142,14 +143,14 @@ def _create_box(key, val) -> dict:
             {
                 "type": "text",
                 "text": key,
-                "size": "sm",
+                "size": size,
                 "color": "#555555",
                 "flex": 0,
             },
             {
                 "type": "text",
                 "text": val,
-                "size": "sm",
+                "size": size,
                 "color": "#111111",
                 "align": "end",
             },

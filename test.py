@@ -1,10 +1,9 @@
 
 from db._parcel_handler import reip_to_geojson
 from db._reip_handler import reip_to_json
-from db._connect import _connect_mongo
 from db._pandas_util import reip_readfile
-from utils._pipeline import _search_keyword, _search_nearby, _search_parcel
 
+from db._connect import _connect_mongo
 from pprint import pprint
 
 def mainf():
@@ -68,12 +67,8 @@ def con():
     
 #     pprint(len(p2na))
 
-from msg.read import read_messages
-from msg.read import search_keyword
-from msg.reply import reply_applicant_search_results
-r = search_keyword('國小', db=con().reip)
-reply_applicant_search_results(r)
-# pprint(
-#     reply_applicant_search_results(r)
-    # )
+from utils.query import search_keyword
+from pprint import pprint
 
+
+pprint(list(search_keyword('公雞', limit=1, nearby=True, db=con().reip)))
