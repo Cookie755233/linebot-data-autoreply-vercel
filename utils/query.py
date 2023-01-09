@@ -48,38 +48,39 @@ def search_keyword(keyword: str,
     return applicant_to_nearby_applicants #! [ ({applicants}, {geo_results}), ... ]
 
 
-# def search_parcel(district: str,
-#                   section: str,
-#                   number:str,
-#                   db: Database=USE_DATABASE, 
-#                   nearby=False, 
-#                   maxDistance=100
-#                   ) -> list:
-#     pipeline = _search_parcel(district, section, number)
-#     search_results = db.parcels.aggregate(pipeline)
+def search_parcel(district: str,
+                  section: str,
+                  number:str,
+                  db: Database=USE_DATABASE, 
+                  nearby=False, 
+                  maxDistance=100
+                  ) -> list:
+    return
+    # pipeline = _search_parcel(district, section, number)
+    # search_results = db.parcels.aggregate(pipeline)
     
     
-#     parcel_to_applicant_information = []
-#     for result in search_results:
-#         dist, sect, num = result['distrestulictName'], result['sectionName'], result['prcl']
-#         parcel_to_applicant_information.append( (dist+sect+num, 
-#                                                  result['relatedParcels']) )
-#     if not nearby: 
-#                #! [ tuple( str, list[set] ) ]
-#                #! [ (parcel_string, `relatedParcels`), ... ]
-#         return parcel_to_applicant_information  
+    # parcel_to_applicant_information = []
+    # for result in search_results:
+    #     dist, sect, num = result['distrestulictName'], result['sectionName'], result['prcl']
+    #     parcel_to_applicant_information.append( (dist+sect+num, 
+    #                                              result['relatedParcels']) )
+    # if not nearby: 
+    #            #! [ tuple( str, list[set] ) ]
+    #            #! [ (parcel_string, `relatedParcels`), ... ]
+    #     return parcel_to_applicant_information  
     
     
-#     parcel_to_nearby_applicants = []
-#     for parcel_string, relatedParcels in parcel_to_applicant_information:
-#         for parcels in relatedParcels:
-#             x, y = parcels['center']['coordinates']
-#             geo_pipeline = _search_nearby(x, y, maxDistance=maxDistance)
-#             geo_results = list(db.applicants.aggregate(geo_pipeline))
+    # parcel_to_nearby_applicants = []
+    # for parcel_string, relatedParcels in parcel_to_applicant_information:
+    #     for parcels in relatedParcels:
+    #         x, y = parcels['center']['coordinates']
+    #         geo_pipeline = _search_nearby(x, y, maxDistance=maxDistance)
+    #         geo_results = list(db.applicants.aggregate(geo_pipeline))
             
-#             parcel_to_nearby_applicants.append( (parcel_string, geo_results) )
+    #         parcel_to_nearby_applicants.append( (parcel_string, geo_results) )
 
-#            #! [ tuple( str, list[set] ) ]
-#            #! [ ( parcel_string, [{applicants}, ...}] ), ... ]
-#     return parcel_to_nearby_applicants 
+    #        #! [ tuple( str, list[set] ) ]
+    #        #! [ ( parcel_string, [{applicants}, ...}] ), ... ]
+    # return parcel_to_nearby_applicants 
 
