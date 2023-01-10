@@ -89,7 +89,7 @@ class StageOperator:
     
     def sort(self,
              field: str):
-        return { '$sort': { field: 1 }}
+        return { '$sort': { field: -1 }}
 
 
     def limit(self, 
