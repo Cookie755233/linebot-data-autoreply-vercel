@@ -42,7 +42,7 @@ def search_applicants(query: str,
             so.geo_near(coordinates=coordinates, maxDistance=maxDistance),
             so.limit(10) #! prevent size>5000
         ]
-        geo_results = list(db.applicants.aggregate(geo_pipeline))
+        geo_results = list(db.applicants.aggregate(geo_pipeline))[1:] #? exclude itslf
         applicant_to_nearby_applicants.append( (item, geo_results) )
 
     return applicant_to_nearby_applicants #! [ ({applicants}, {geo_results}), ... ]
