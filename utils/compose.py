@@ -60,7 +60,8 @@ def compose_applicant_nearby_results(results):
                                           appl,
                                           f'共找到 {geo_result_cnt} 筆鄰近案場',
                                           top_color=stat_color,
-                                          top_right_text=prsn)
+                                          top_right_text=prsn,
+                                          top_right_size='xs')
         
         for j, geo_result in enumerate(geo_results):
             x = geo_result['PRSN']

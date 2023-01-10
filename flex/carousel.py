@@ -34,7 +34,8 @@ class Bubble:
                                    top_size='sm',
                                    title_size='lg',
                                    appendix_size='xxs',
-                                   top_right_text='-'):
+                                   top_right_text='-',
+                                   top_right_size='sm'):
         self.bubble["body"]["contents"] += [
             {
                 "type": "box",
@@ -52,7 +53,7 @@ class Bubble:
                     "text": top_right_text,
                     "align": "end",
                     "color": "#aaaaaa",
-                    "size": "sm"
+                    "size": top_right_size
                 }
                 ]
             },
@@ -100,7 +101,8 @@ class Bubble:
                         "text": subtitle,
                         "size": subtitle_size,
                         "weight": "bold",
-                        "color": subtitle_color
+                        "color": subtitle_color,
+                        "wrap": True
                     },
                     #? <-- items -->
                     *items
