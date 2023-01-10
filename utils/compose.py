@@ -63,6 +63,7 @@ def compose_applicant_nearby_results(results):
                                           top_right_text=prsn)
         
         for j, geo_result in enumerate(geo_results):
+            x = geo_result['PRSN']
             n = geo_result['applicantName']
             p = geo_result['position']
             t = geo_result['type']
@@ -73,11 +74,12 @@ def compose_applicant_nearby_results(results):
             d = geo_result['distance']
             
             clr = "#46844f" if r == '核准' else "#C28285"
-            bubble.insert_body_contents_ITEM(f'{j+1}. {n}',
+            bubble.insert_body_contents_ITEM(f'{j+1}. {n}({x})',
                                          '設置類型', f'{p} - {t}',
                                          '案件狀態', f'{r} - {s}',
                                          '面積/容量', f'{a:,.0f} M2 / {c:,.0f} kW',
-                                         '距離', f'{d} 公尺',
+                                         '距離', f'{float(d):,.0f} 公尺',
+                                         subtitle_size='sm',
                                          subtitle_color=clr,
                                          item_size='xxs')
             
