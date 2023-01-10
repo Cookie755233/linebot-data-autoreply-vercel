@@ -183,7 +183,7 @@ def compose_parcel_nearby_results(results):
             
             bubble.insert_body_contents_ITEM(f'{j+1}. {n} ({p}-{t})',
                                          '面積/容量', f'{a:,.0f} M2 / {c:,.0f} kW',
-                                         '距離', f'{d} 公尺',
+                                         '距離', f'{float(d):,.0f} 公尺',
                                          subtitle_color=clr,
                                          item_size='xxs')
             

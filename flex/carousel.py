@@ -33,14 +33,28 @@ class Bubble:
                                    title_color="#000000",
                                    top_size='sm',
                                    title_size='lg',
-                                   appendix_size='xxs'):
+                                   appendix_size='xxs',
+                                   top_right_text='-'):
         self.bubble["body"]["contents"] += [
             {
-                "type": "text",
-                "text": status,
-                "weight": "bold",
-                "color": top_color,
-                "size": top_size,
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": status,
+                    "weight": "bold",
+                    "color": top_color,
+                    "size": top_size
+                },
+                {
+                    "type": "text",
+                    "text": top_right_text,
+                    "align": "end",
+                    "color": "#aaaaaa",
+                    "size": "sm"
+                }
+                ]
             },
             {
                 "type": "text",
@@ -129,13 +143,14 @@ class Bubble:
         
     def insert_footer_contents_BOTTON(self,
                                       longitude: float,
-                                      latitude: float):
+                                      latitude: float, 
+                                      label='取得位置資訊'):
         self.bubble['footer']['contents'].append(
             {
                 "type": "button",
                 "action": {
                     "type": "postback",
-                    "label": "取得位置資訊",
+                    "label": label,
                     "data": f"location: {longitude}, {latitude}",
                     "displayText": "取得位置資訊"
                 },
