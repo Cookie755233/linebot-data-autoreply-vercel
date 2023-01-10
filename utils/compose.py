@@ -38,10 +38,6 @@ def compose_applicant_results(results):
         bubble.insert_body_contents_SEP()
         bubble.insert_body_contents_FOOTER('ID', f'{ersn} / {prsn}')
         bubble.insert_footer_contents_BOTTON(lng, lat)
-        # print(
-        #     list(map(float, re.findall(
-        #         r'[0-9]*[.]?[0-9]+', f"location: {lng}, {lat}")))
-        # )
         carousel.insert_bubble(bubble.bubble)
 
     return carousel.container
@@ -52,7 +48,7 @@ def compose_applicant_nearby_results(results):
     carousel = Carousel()
     for i, (applicant, geo_results) in enumerate(results):
         if i >= 11: break
-        
+        prsn   = applicant['PRSN']
         appl   = applicant["applicantName"]
         res    = applicant['result']
         stat   = applicant['status']
@@ -63,7 +59,8 @@ def compose_applicant_nearby_results(results):
         bubble.insert_body_contents_TITLE(f'{res} - {stat}', 
                                           appl,
                                           f'共找到 {geo_result_cnt} 筆鄰近案場',
-                                          top_color=stat_color)
+                                          top_color=stat_color,
+                                          top_right_text=prsn)
         
         for j, geo_result in enumerate(geo_results):
             n = geo_result['applicantName']
@@ -134,7 +131,6 @@ def compose_parcel_results(results):
                 '土地面積', f'{la_E:,.2f} / {la:,.2f} M2',
                 subtitle_color=stat_color
                 )
-            bubble.insert_body_contents_SEP()
 
             if j+1 != len(related_applicants):
                 bubble.insert_body_contents_SEP()
@@ -170,20 +166,22 @@ def compose_parcel_nearby_results(results):
 
 
         for j, geo_result in enumerate(geo_results):
+            if j >= 5: 
+                bubble.insert_body_contents_FOOTER(f'共計{len(geo_results)}件鄰近案場，顯示{j+1}件', '-')
+                break
+            
             n = geo_result['applicantName']
             p = geo_result['position']
             t = geo_result['type']
             r = geo_result['result']
-            s = geo_result['status']
+            # s = geo_result['status']
             c = geo_result['totalCapacity']
             a = geo_result['landArea']
             d = geo_result['distance']
 
             clr = "#46844f" if r == '核准' else "#C28285"
             
-            bubble.insert_body_contents_ITEM(f'{j+1}. {n}',
-                                         '設置類型', f'{p} - {t}',
-                                         '案件狀態', f'{r} - {s}',
+            bubble.insert_body_contents_ITEM(f'{j+1}. {n} ({p}-{t})',
                                          '面積/容量', f'{a:,.0f} M2 / {c:,.0f} kW',
                                          '距離', f'{d} 公尺',
                                          subtitle_color=clr,
