@@ -73,7 +73,7 @@ from utils.compose import compose_parcel_nearby_results, compose_parcel_results
 from utils.message import inspect_user_message
 pprint(
     search_applicants('天英能源股份有限公司',
-                      nearby=False, db=con().reip, 
-                      limit=1, 
+                      nearby=True, db=con().reip, 
+                      maxDistance=100
                       )
 )

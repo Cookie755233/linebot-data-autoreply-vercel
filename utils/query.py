@@ -28,7 +28,7 @@ def search_applicants(query: str,
 
     if limit: 
         pipeline.append(so.limit(limit))
-    search_results = list(db.applicants.aggregate(pipeline))
+    search_results = list(db.applicants.aggregate(pipeline))[:12] #! narrow down to carousel limit: 12
     
     #? if nearby not required
     if not nearby: 
@@ -39,7 +39,8 @@ def search_applicants(query: str,
     for item in search_results:
         coordinates = item['center']['coordinates']
         geo_pipeline = [
-            so.geo_near(coordinates=coordinates, maxDistance=maxDistance)
+            so.geo_near(coordinates=coordinates, maxDistance=maxDistance),
+            so.limit(10) #! prevent size>5000
         ]
         geo_results = list(db.applicants.aggregate(geo_pipeline))
         applicant_to_nearby_applicants.append( (item, geo_results) )
@@ -68,7 +69,7 @@ def search_parcels(district: str,
     ]
     if limit: 
         pipeline.append(so.limit(limit))
-    search_results = list(db.parcels.aggregate(pipeline))
+    search_results = list(db.parcels.aggregate(pipeline))[:12]
     
     if not nearby: 
         return search_results
@@ -77,7 +78,8 @@ def search_parcels(district: str,
     for result in search_results:
         coordinates = result['location']['coordinates']
         geo_pipeline = [
-            so.geo_near(coordinates=coordinates, maxDistance=maxDistance)
+            so.geo_near(coordinates=coordinates, maxDistance=maxDistance),
+            so.limit(10)
         ]
         geo_results = list(db.applicants.aggregate(geo_pipeline))
 
