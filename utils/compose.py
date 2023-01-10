@@ -97,6 +97,8 @@ def compose_parcel_results(results):
     carousel = Carousel()
     
     for i, result in enumerate(results):
+        if i >= 11: break
+        
         luz  = result['landUseZoning']
         lut  = result['landUseType']
         lng, lat = result['location']['coordinates']
@@ -138,8 +140,8 @@ def compose_parcel_results(results):
                 bubble.insert_body_contents_SEP()
 
         bubble.insert_footer_contents_BOTTON(lng, lat)
-
-    carousel.insert_bubble(bubble.bubble)
+        carousel.insert_bubble(bubble.bubble)
+        
     return carousel.container
 
 
@@ -147,6 +149,8 @@ def compose_parcel_nearby_results(results):
     carousel = Carousel()
 
     for i, (parcel, geo_results) in enumerate(results):
+        if i >= 11: break
+        
         luz  = parcel['landUseZoning']
         lut  = parcel['landUseType']
         lng, lat = parcel['location']['coordinates']
