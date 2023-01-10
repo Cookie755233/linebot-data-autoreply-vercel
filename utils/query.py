@@ -11,7 +11,9 @@ USE_DATABASE = _connect_mongo().reip
 def search_applicants(query: str, 
                       nearby: bool=False,
                       maxDistance: float=100.0, 
-                      
+                      selectDistrict=None,
+                      selectResult=None,
+
                       limit: int=0,
                       min_searchScore: int=1,
                       db: Database=USE_DATABASE,
@@ -25,9 +27,10 @@ def search_applicants(query: str,
         so.match( deafult_searchScore_name, { '$gt': min_searchScore } ),
         so.sort(field=deafult_searchScore_name),
     ]
+    # if selectDistrict: pipeline.append(so.match( 'districtName', selectDistrict ) )　#TODO Add 'section' to applicants
+    if selectResult: pipeline.append(so.match( 'result', selectResult) )
+    if limit: pipeline.append(so.limit(limit))
 
-    if limit: 
-        pipeline.append(so.limit(limit))
     search_results = list(db.applicants.aggregate(pipeline))[:12] #! narrow down to carousel limit: 12
     
     #? if nearby not required
@@ -40,7 +43,7 @@ def search_applicants(query: str,
         coordinates = item['center']['coordinates']
         geo_pipeline = [
             so.geo_near(coordinates=coordinates, maxDistance=maxDistance),
-            so.limit(10) #! prevent size>5000
+            so.limit(6) #! prevent size>5000
         ]
         geo_results = list(db.applicants.aggregate(geo_pipeline))[1:] #? exclude itslf
         applicant_to_nearby_applicants.append( (item, geo_results) )
@@ -54,6 +57,9 @@ def search_parcels(district: str,
                    
                    nearby: bool=False, 
                    maxDistance: float=100.0,
+                   selectDistrict=None,
+                   selectResult=None,
+
                    limit: int=0,
                    db: Database=USE_DATABASE, 
                    ) -> list:
@@ -61,28 +67,34 @@ def search_parcels(district: str,
     pipeline = [
         so.match('districtName', district,
                  'sectionName', section,
-                 'prcl',so.regex(prcl)),
+                 'prcl', so.regex(prcl)),
         so.lookup(from_='applicants', 
                   local_field='_id',
                   foreign_field='georeferencedParcels',
                   as_='relatedApplicants'),
     ]
-    if limit: 
-        pipeline.append(so.limit(limit))
+    if selectResult: pipeline.append(so.match( 'result', selectResult) )
+    if limit: pipeline.append(so.limit(limit))
     search_results = list(db.parcels.aggregate(pipeline))[:12]
     
     if not nearby: 
         return search_results
 
+    QUERY = dict()
+    if selectDistrict: QUERY['distictName'] = district
+    if selectResult: QUERY['result'] = result
+
     parcel_to_nearby_applicants = []
     for result in search_results:
         coordinates = result['location']['coordinates']
         geo_pipeline = [
-            so.geo_near(coordinates=coordinates, maxDistance=maxDistance),
-            so.limit(10)
+            so.geo_near(coordinates=coordinates, 
+                        maxDistance=maxDistance,
+                        query=QUERY),
+            so.limit(5)
         ]
-        geo_results = list(db.applicants.aggregate(geo_pipeline))
 
+        geo_results = list(db.applicants.aggregate(geo_pipeline))
         parcel_to_nearby_applicants.append( (result, geo_results) ) 
         
     return parcel_to_nearby_applicants

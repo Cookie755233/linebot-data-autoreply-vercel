@@ -170,6 +170,7 @@ def compose_parcel_nearby_results(results):
 
         for j, geo_result in enumerate(geo_results):
             if j >= 5: 
+                #TODO: create list of all search results if more than maximum
                 bubble.insert_body_contents_FOOTER(f'共計{len(geo_results)}件鄰近案場，顯示{j}件', '-')
                 break
             

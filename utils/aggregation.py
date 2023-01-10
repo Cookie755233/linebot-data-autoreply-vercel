@@ -8,8 +8,7 @@ class StageOperator:
                  
                  type='Point',
                  distanceField='distance',
-                 query={},
-                 spherical=True) -> dict:
+                 query={}) -> dict:
         return\
         {
             '$geoNear': {
@@ -19,7 +18,7 @@ class StageOperator:
                 }, 
                 'distanceField': distanceField, 
                 'maxDistance': maxDistance, 
-                'query': {}, 
+                'query': query, 
                 'spherical': True
             }
         }

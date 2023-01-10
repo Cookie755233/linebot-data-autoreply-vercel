@@ -39,9 +39,8 @@ def inspect_user_message(user_message: str):
         results = search_applicants(query=query, 
                                     nearby=config.nearby,
                                     maxDistance=config.maxDistance, 
-                                #  selectDistrict=config.selectDistrict,
-                                #  selectSection=config.selectSection, 
-                                #  selectResult=config.selectResult
+                                    selectDistrict=config.selectDistrict,
+                                    selectResult=config.selectResult
                                  )
         if not results:
             return 301+config.nearby, None

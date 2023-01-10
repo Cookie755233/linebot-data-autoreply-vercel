@@ -72,8 +72,11 @@ from pprint import pprint
 from utils.compose import compose_parcel_nearby_results, compose_parcel_results
 from utils.message import inspect_user_message
 pprint(
-    search_applicants('天英能源股份有限公司',
+    [
+        len(j) for i, j in search_parcels('鹽水區', '水秀段', '741',
                       nearby=True, db=con().reip, 
-                      maxDistance=100
+                      maxDistance=100,
                       )
+    ]
+    
 )
