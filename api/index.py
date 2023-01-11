@@ -12,12 +12,12 @@ from utils.compose import (
     compose_applicant_results, compose_applicant_nearby_results,
     compose_parcel_results, compose_parcel_nearby_results
 )
-
+from utils.message import MessageHandler
 import const.error as ERROR_MESSAGE
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 line_handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
-
+message_handler = MessageHandler()
 
 app = Flask(__name__)
 
@@ -48,6 +48,18 @@ def handle_message(event):
         return
 
     user_message = event.message.text
+    # #!
+    # message_handler.inspect(user_message)
+    # message_handler.execute()
+    
+    # line_bot_api.reply_message(
+    #     event.reply_token,
+    #     message_handler.package)
+    
+    
+    # #!
+    
+    
     status, return_value = inspect_user_message(user_message)
     
     reply_message[status](return_value)
