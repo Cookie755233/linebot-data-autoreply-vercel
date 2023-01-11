@@ -70,7 +70,7 @@ def con():
 from utils.query import search_parcels, search_applicants
 from pprint import pprint
 from utils.compose import compose_parcel_nearby_results, compose_parcel_results
-from utils.message import inspect_user_message
+from utils.read_message import inspect_user_message
 pprint(
     [
         len(j) for i, j in search_parcels('鹽水區', '水秀段', '741',

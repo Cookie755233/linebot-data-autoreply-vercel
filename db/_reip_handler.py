@@ -2,10 +2,9 @@
 import pandas as pd
 import numpy as np
 
-
 #? <-----  Create json data ----->
-def reip_to_json(pr_df: pd.DataFrame,   #! _pandas_readfile(georeferenced_pr_file_path, 'data')
-                 er_df: pd.DataFrame,   #! _pandas_readfile(rawdata_er_file_path)
+def reip_to_json(pr_df: pd.DataFrame, 
+                 er_df: pd.DataFrame, 
                  sep = ','              # doesn't really matter, ensure both situations are the same
                  ) -> dict:
     '''

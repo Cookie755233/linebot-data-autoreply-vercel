@@ -1,7 +1,6 @@
 
 import pandas as pd
 import datetime as dt
-from db._db_usecol import *
 
 #? <-----  Create json data ----->
 def ls_to_json(ls_df: pd.DataFrame,

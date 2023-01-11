@@ -7,7 +7,7 @@ from linebot.models import (
     MessageEvent, PostbackEvent,
     TextMessage, TextSendMessage, FlexSendMessage, LocationSendMessage
 )
-from utils.message import inspect_user_message
+from utils.read_message import inspect_user_message
 from utils.compose import (
     compose_applicant_results, compose_applicant_nearby_results,
     compose_parcel_results, compose_parcel_nearby_results
@@ -49,6 +49,8 @@ def handle_message(event):
 
     user_message = event.message.text
     status, return_value = inspect_user_message(user_message)
+    
+    reply_message[status](return_value)
     
     if status == 201:
         flex_message = compose_applicant_results(return_value)
