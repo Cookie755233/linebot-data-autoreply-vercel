@@ -73,7 +73,6 @@ def handle_message(event):
     #         event.reply_token,
     #         FlexSendMessage(alt_text="Search results", 
     #                         contents=flex_message))
-
     # if status == 203:
     #     flex_message = compose_parcel_results(return_value)
     #     line_bot_api.reply_message(
@@ -98,7 +97,7 @@ def handle_message(event):
 def handle_postback(event):
     if event.postback.data.startswith('location'):
         longitude, latitude, title, address = re.findall(
-            r'location: ([0-9]*[.]?[0-9]+), ([0-9]*[.]?[0-9]+) \| title: (.*) \| address (.*)',
+            r'location: ([0-9]*[.]?[0-9]+), ([0-9]*[.]?[0-9]+) \| title: (.*) \| address: (.*)',
             event.postback.data)[0]
         
         line_bot_api.reply_message(

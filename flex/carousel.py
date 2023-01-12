@@ -143,7 +143,7 @@ class Bubble:
         self.bubble["body"]["contents"].append({"type": "separator", "margin": "xxl"})
         
         
-    def insert_footer_contents_BOTTON(self,
+    def insert_footer_contents_BOTTOM(self,
                                       longitude: float,
                                       latitude: float, 
                                       title=None,
@@ -359,7 +359,7 @@ def _create_box(key, val, size='sm') -> dict:
 #     return bubble
 
 
-# def _insert_footer_contents_BOTTON(bubble):
+# def _insert_footer_contents_BOTTOM(bubble):
 #     bubble['footer']['contents'].append(
 #         {
 #             "type": "button",
@@ -410,7 +410,7 @@ def _create_box(key, val, size='sm') -> dict:
 
 #         bubble = _insert_body_contents_FOOTER(bubble, 
 #                                              "PARCEL ID", f"#{_id}")
-#         bubble = _insert_footer_contents_BOTTON(bubble)
+#         bubble = _insert_footer_contents_BOTTOM(bubble)
 #         carousel_container["contents"].append(bubble)
 
 
@@ -444,5 +444,5 @@ def _create_box(key, val, size='sm') -> dict:
 #         bubble = _insert_body_contents_SEP(bubble)
 #         bubble = _insert_body_contents_FOOTER(bubble, 
 #                                              "ID", f"#{_id}")
-#         bubble = _insert_footer_contents_BOTTON(bubble)
+#         bubble = _insert_footer_contents_BOTTOM(bubble)
 #         carousel_container["contents"].append(bubble)

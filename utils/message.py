@@ -26,18 +26,26 @@ class ConfigParser:
             >> maxDistance: {self.maxDistance}
             >> selectDistrict: {self.selectDistrict}
             >> selectResult: {self.selectResult}'''
+
+    @classmethod
+    def from_configs(cls, configs):
+        c = cls()
+        c.parse(configs)
+
+        return c
     
     def parse(self, configs):
         for config in configs:
             if config.startswith('#鄰近'):
-                self._register_nearby_config(config)
+                self._register_nearby_configs(config)
                 continue
             
             if config.startswith('#'):
-                self._register_subquery_config(config)
+                self._register_subquery_configs(config)
         return self
     
-    def _register_nearby_config(self, config: str) -> None:
+    
+    def _register_nearby_configs(self, config: str) -> None:
         try:
             distance, unit = re.findall(
                 r'([0-9]*[.]?[0-9]+)(公里|公尺|米|m|km)?', config)[0]
@@ -47,20 +55,20 @@ class ConfigParser:
         self.nearby = True
         self.maxDistance = float(distance) * self.UNIT[unit]
     
-    def _register_subquery_config(self, config: str) -> None:
-        if '區' in config or '段' in config:
+    def _register_subquery_configs(self, config: str) -> None:
+        if '區' in config:
             try:
-                district, _ = re.findall(r'(.*?區)?(.*?段)?', config[1:])[0]
+                district, _ = re.findall(r'(.*?區)(.*?段)?', config[1:])[0]
                 district = None if not district else district
-            except ValueError: 
+            except IndexError: 
                 return 
             
-            self.selectDistrict = district or self.selectDistrict
+            self.selectDistrict = district
             
         elif config in self.RESULT:
-            self.selectResult = config[1:]
-    
-    
+            self.selectResult = config[1:] #parse the '#' in front of '#result'
+
+
 class MessageHandler:
     def __init__(self) -> None:
         self.user_messages = None
@@ -76,16 +84,16 @@ class MessageHandler:
             return
         
         query_type, query, *configs = self.user_messages
-        self.config = ConfigParser().parse(configs)
+        self.config = ConfigParser.from_configs(configs)
         self.status, self.search_result = \
             self._select_query(query_type)(query=query,
-                                            nearby=self.config.nearby,
-                                            maxDistance=self.config.maxDistance, 
-                                            selectDistrict=self.config.selectDistrict,
-                                            selectResult=self.config.selectResult)
+                                           nearby=self.config.nearby,
+                                           maxDistance=self.config.maxDistance,
+                                           selectDistrict=self.config.selectDistrict,
+                                           selectResult=self.config.selectResult)
             
     @property    
-    def response(self): # -> linebot.models
+    def response(self): # -> linebot.models?
         return self._compose_response(self.status, self.search_result)
         
         

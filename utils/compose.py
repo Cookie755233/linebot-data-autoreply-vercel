@@ -37,7 +37,7 @@ def compose_applicant_results(results):
                                          )
         bubble.insert_body_contents_SEP()
         bubble.insert_body_contents_FOOTER('ID', f'{ersn} / {prsn}')
-        bubble.insert_footer_contents_BOTTON(lng, lat, 
+        bubble.insert_footer_contents_BOTTOM(lng, lat, 
                                              title=appl,
                                              address=addr)
         carousel.insert_bubble(bubble.bubble)
@@ -140,7 +140,7 @@ def compose_parcel_results(results):
             if j+1 != len(related_applicants):
                 bubble.insert_body_contents_SEP()
 
-        bubble.insert_footer_contents_BOTTON(lng, lat)
+        bubble.insert_footer_contents_BOTTOM(lng, lat)
         carousel.insert_bubble(bubble.bubble)
         
     return carousel.container
@@ -196,7 +196,7 @@ def compose_parcel_nearby_results(results):
             if j+1 != len(geo_results):
                 bubble.insert_body_contents_SEP()
 
-        bubble.insert_footer_contents_BOTTON(lng, lat, 
+        bubble.insert_footer_contents_BOTTOM(lng, lat, 
                                              title=parcel_string, 
                                              address=f'{lng},{lat}')
 
