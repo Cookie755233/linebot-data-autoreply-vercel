@@ -27,7 +27,7 @@ def search_applicants(query: str,
         operator.text_search(query=query, path=['applicantName'], index='keyword_index', maxEdits=1),
         operator.set_field(field=deafult_searchScore_name, expression={'$meta': deafult_searchScore_name}),
         operator.match( deafult_searchScore_name, { '$gt': min_searchScore } ),
-        operator.operatorrt(field=deafult_searchScore_name),
+        operator.sort(field=deafult_searchScore_name),
     ]
     if selectDistrict: pipeline.append(operator.match( 'districtName', selectDistrict ) )
     if selectResult: pipeline.append(operator.match( 'result', selectResult) )
@@ -69,8 +69,8 @@ def search_parcels(query: str,
     try:
         district, section, prcl = re.findall(
             r'(.*區)(.*段)(\d{1,4}-?\d{0,4})地?號?', query)[0]
-    except ValueError:
-        return (400, )
+    except IndexError:
+        return 400, None
     
     pipeline = [
         operator.match('districtName', district,

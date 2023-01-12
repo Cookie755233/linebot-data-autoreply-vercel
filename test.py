@@ -12,6 +12,7 @@ def con():
     return client
 
 h =  MessageHandler()
-h.inspect('@查詢地號\n七股區七股段1號').execute()
+h.inspect('@查詢\n你媽\n＃七股區')
+response = h.response
 
-pprint(h.search_result)
+pprint(h)

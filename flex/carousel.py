@@ -146,15 +146,18 @@ class Bubble:
     def insert_footer_contents_BOTTON(self,
                                       longitude: float,
                                       latitude: float, 
-                                      label='取得位置資訊'):
+                                      title=None,
+                                      address=None,
+                                      label='取得位置資訊', 
+                                      displayText='取得位置資訊'):
         self.bubble['footer']['contents'].append(
             {
                 "type": "button",
                 "action": {
                     "type": "postback",
                     "label": label,
-                    "data": f"location: {longitude}, {latitude}",
-                    "displayText": "取得位置資訊"
+                    "data": f"location: {longitude}, {latitude} | title: {title} | address: {address}",
+                    "displayText": displayText
                 },
             }
         )

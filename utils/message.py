@@ -1,21 +1,19 @@
 
 import re
-from typing import Optional, Tuple
-from linebot.models import (
-    TextSendMessage, FlexSendMessage, LocationSendMessage
-)
+from typing import Optional
+from linebot.models import TextSendMessage, FlexSendMessage
 
 from utils.query import *
 from utils.compose import *
 import const.error as ERROR
 
 
-class Config:
+class ConfigParser:
     UNIT = {'公尺': 1, '米': 1, 'm': 1, '': 1, '公里': 1000, 'km': 1000}
     RESULT = ["#全文檢還", "#審查中", "#撤件", "#核准", "#補正", "#駁回"]
+
     
-    def __init__(self, configs) -> None:
-        self.configs = configs
+    def __init__(self) -> None:
         self.nearby = None
         self.maxDistance = None
         self.selectDistrict = None
@@ -29,8 +27,8 @@ class Config:
             >> selectDistrict: {self.selectDistrict}
             >> selectResult: {self.selectResult}'''
     
-    def parse(self):
-        for config in self.configs:
+    def parse(self, configs):
+        for config in configs:
             if config.startswith('#鄰近'):
                 self._register_nearby_config(config)
                 continue
@@ -63,10 +61,6 @@ class Config:
             self.selectResult = config[1:]
     
     
-    
-    
-    
-    
 class MessageHandler:
     def __init__(self) -> None:
         self.user_messages = None
@@ -77,16 +71,12 @@ class MessageHandler:
     def inspect(self, user_message: str):
         self.user_messages = self._unify(user_message)
         self.status = self._validate() or None
-        if self.status:
-            self.package = self._create_line_send_mesage(self.status)
         
-        return self
-            
-    def execute(self):
-        if self.status == 400: return
+        if self.status: 
+            return
         
         query_type, query, *configs = self.user_messages
-        self.config = Config(configs).parse()
+        self.config = ConfigParser().parse(configs)
         self.status, self.search_result = \
             self._select_query(query_type)(query=query,
                                             nearby=self.config.nearby,
@@ -95,8 +85,8 @@ class MessageHandler:
                                             selectResult=self.config.selectResult)
             
     @property    
-    def line_send_message(self): # -> linebot.models
-        self._create_line_send_mesage(self.status, self.search_result)
+    def response(self): # -> linebot.models
+        self._compose_response(self.status, self.search_result)
         
         
     def _unify(self, message: str) -> list:
@@ -115,23 +105,24 @@ class MessageHandler:
             '@查詢': search_applicants,
             '@查詢地號': search_parcels
         }
-        return USE_FUNC.get(query_type, None)
+        return USE_FUNC.get(query_type)
     
     
-    def _create_line_send_mesage(self, status, search_result=None):
+    def _compose_response(self, status, search_result=None):
         if status > 300:
             return {
                 301: TextSendMessage(ERROR.APPLICANT_NOT_FOUND_ERROR),
                 303: TextSendMessage(ERROR.PARCEL_NOT_FOUND_ERROR),
                 400: TextSendMessage(ERROR.USER_INPUT_ERROR)
             }.get(status)
+            
         else:
             f = {
                 201: compose_applicant_results,
                 202: compose_applicant_nearby_results,
                 203: compose_parcel_results,
-                204: compose_parcel_nearby_results}.get(status)
-            
-            
+                204: compose_parcel_nearby_results
+            }.get(status)
+
             return FlexSendMessage(alt_text="Search Results",
                                    contents = f(search_result))

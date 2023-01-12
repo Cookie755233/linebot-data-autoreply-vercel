@@ -7,11 +7,12 @@ from linebot.models import (
     MessageEvent, PostbackEvent,
     TextMessage, TextSendMessage, FlexSendMessage, LocationSendMessage
 )
-from utils.read_message import inspect_user_message
-from utils.compose import (
-    compose_applicant_results, compose_applicant_nearby_results,
-    compose_parcel_results, compose_parcel_nearby_results
-)
+
+# from utils.read_message import inspect_user_message
+# from utils.compose import (
+#     compose_applicant_results, compose_applicant_nearby_results,
+#     compose_parcel_results, compose_parcel_nearby_results
+# )
 from utils.message import MessageHandler
 import const.error as ERROR_MESSAGE
 
@@ -48,66 +49,63 @@ def handle_message(event):
         return
 
     user_message = event.message.text
-    # #!
-    # message_handler.inspect(user_message)
-    # message_handler.execute()
+    message_handler.inspect(user_message)
+    response = message_handler.response
     
-    # line_bot_api.reply_message(
-    #     event.reply_token,
-    #     message_handler.package)
-    
-    
-    # #!
+    line_bot_api.reply_message(
+        event.reply_token, response
+    )
     
     
-    status, return_value = inspect_user_message(user_message)
     
-    reply_message[status](return_value)
+    # status, return_value = inspect_user_message(user_message)
+    # reply_message[status](return_value)
     
-    if status == 201:
-        flex_message = compose_applicant_results(return_value)
-        line_bot_api.reply_message(
-            event.reply_token,
-            FlexSendMessage(alt_text="Search results", 
-                            contents=flex_message))
-    if status == 202:
-        flex_message = compose_applicant_nearby_results(return_value)
-        line_bot_api.reply_message(
-            event.reply_token,
-            FlexSendMessage(alt_text="Search results", 
-                            contents=flex_message))
+    # if status == 201:
+    #     flex_message = compose_applicant_results(return_value)
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         FlexSendMessage(alt_text="Search results", 
+    #                         contents=flex_message))
+    # if status == 202:
+    #     flex_message = compose_applicant_nearby_results(return_value)
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         FlexSendMessage(alt_text="Search results", 
+    #                         contents=flex_message))
 
-    if status == 203:
-        flex_message = compose_parcel_results(return_value)
-        line_bot_api.reply_message(
-            event.reply_token,
-            FlexSendMessage(alt_text="Search results", 
-                            contents=flex_message))
+    # if status == 203:
+    #     flex_message = compose_parcel_results(return_value)
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         FlexSendMessage(alt_text="Search results", 
+    #                         contents=flex_message))
 
-    if status == 204:
-        flex_message = compose_parcel_nearby_results(return_value)
-        line_bot_api.reply_message(
-            event.reply_token,
-            FlexSendMessage(alt_text="Search results", 
-                            contents=flex_message))
+    # if status == 204:
+    #     flex_message = compose_parcel_nearby_results(return_value)
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         FlexSendMessage(alt_text="Search results", 
+    #                         contents=flex_message))
 
-    if status == 400:
-        line_bot_api.reply_message(
-            event.reply_token, 
-            TextSendMessage(ERROR_MESSAGE.USER_INPUT_ERROR)
-        )
+    # if status == 400:
+    #     line_bot_api.reply_message(
+    #         event.reply_token, 
+    #         TextSendMessage(ERROR_MESSAGE.USER_INPUT_ERROR)
+    #     )
 
 @line_handler.add(PostbackEvent)
 def handle_postback(event):
     if event.postback.data.startswith('location'):
-        longitude, latitude = re.findall(
-            r'[0-9]*[.]?[0-9]+', event.postback.data)
+        longitude, latitude, title, address = re.findall(
+            r'location: ([0-9]*[.]?[0-9]+), ([0-9]*[.]?[0-9]+) \| title: (.*) \| address (.*)',
+            event.postback.data)[0]
         
         line_bot_api.reply_message(
             event.reply_token,
             LocationSendMessage(
-                title = "TITLE",
-                address = "ADDRESS",
+                title = title,
+                address = address,
                 latitude = float(latitude),
                 longitude = float(longitude)
                 )
