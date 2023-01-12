@@ -86,7 +86,7 @@ class MessageHandler:
             
     @property    
     def response(self): # -> linebot.models
-        self._compose_response(self.status, self.search_result)
+        return self._compose_response(self.status, self.search_result)
         
         
     def _unify(self, message: str) -> list:
