@@ -1,5 +1,4 @@
 
-
 def pairwise(iterable):
     iterable = iter(iterable)
     while True:

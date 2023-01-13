@@ -18,7 +18,7 @@ PR_RENAMED = ['PRSN', 'applicantCategory', 'applicantName',
               'isGreenRoof', 'illegalBuilding', 'illegalBuildingCategory',
               'status', 'result',
               'initialReceiveDate', 'withdrawDate', 'rejectionDate', 'permitDate',
-              'georeferencedParcels', 'relevantParcel']
+              'georeferencedParcels', 'districtName'] #! districtName = relevantSection => for united purposes
 
 ER_USECOL = ['同意備案編號','設備登記編號','設備面積_m2_', '土地面積_m2_', '總裝置容量_kW_', '單一裝置容量_kW_', '設備數量']
 ER_RENAMED = ['PRSN', 'ERSN', 'equipmentArea_ER', 'landArea_ER', 'totalCapacity_ER', 'singleDeviceCapacity_ER', 'quantity_ER']

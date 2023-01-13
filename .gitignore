@@ -185,3 +185,10 @@ cython_debug/
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+
+_run.py
+_test.py
+_update_db.py
+
+db

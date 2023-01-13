@@ -3,95 +3,39 @@ import re
 from typing import Optional
 from linebot.models import TextSendMessage, FlexSendMessage
 
-from utils.query import *
-from utils.compose import *
+from utils.query import Config, Query
+from utils.compose import (
+    compose_applicant_results, compose_applicant_nearby_results, 
+    compose_parcel_results, compose_parcel_nearby_results
+)
 import const.error as ERROR
 
 
-class ConfigParser:
-    UNIT = {'公尺': 1, '米': 1, 'm': 1, '': 1, '公里': 1000, 'km': 1000}
-    RESULT = ["#全文檢還", "#審查中", "#撤件", "#核准", "#補正", "#駁回"]
-
-    
-    def __init__(self) -> None:
-        self.nearby = None
-        self.maxDistance = None
-        self.selectDistrict = None
-        self.selectResult = None
-
-    def __repr__(self) -> str:
-        return f'''\
-            [ CONFIG ]
-            >> nearby: {self.nearby}
-            >> maxDistance: {self.maxDistance}
-            >> selectDistrict: {self.selectDistrict}
-            >> selectResult: {self.selectResult}'''
-
-    @classmethod
-    def from_configs(cls, configs):
-        c = cls()
-        c.parse(configs)
-
-        return c
-    
-    def parse(self, configs):
-        for config in configs:
-            if config.startswith('#鄰近'):
-                self._register_nearby_configs(config)
-                continue
-            
-            if config.startswith('#'):
-                self._register_subquery_configs(config)
-        return self
-    
-    
-    def _register_nearby_configs(self, config: str) -> None:
-        try:
-            distance, unit = re.findall(
-                r'([0-9]*[.]?[0-9]+)(公里|公尺|米|m|km)?', config)[0]
-        except ValueError:
-            return 
-        
-        self.nearby = True
-        self.maxDistance = float(distance) * self.UNIT[unit]
-    
-    def _register_subquery_configs(self, config: str) -> None:
-        if '區' in config:
-            try:
-                district, _ = re.findall(r'(.*?區)(.*?段)?', config[1:])[0]
-                district = None if not district else district
-            except IndexError: 
-                return 
-            
-            self.selectDistrict = district
-            
-        elif config in self.RESULT:
-            self.selectResult = config[1:] #parse the '#' in front of '#result'
-
-
-class MessageHandler:
-    def __init__(self) -> None:
-        self.user_messages = None
-        self.status = None
-        self.config = None
-        self.search_result = []
+class ContentManager:
+    def __init__(self, user_message=None, status=None, search_result=None) -> None:
+        self.user_messages = user_message
+        self.status = status
+        self.search_result = search_result
         
     def inspect(self, user_message: str):
         self.user_messages = self._unify(user_message)
         self.status = self._validate() or None
-        
         if self.status: 
-            return
+            return self
         
-        query_type, query, *configs = self.user_messages
-        self.config = ConfigParser.from_configs(configs)
-        self.status, self.search_result = \
-            self._select_query(query_type)(query=query,
-                                           nearby=self.config.nearby,
-                                           maxDistance=self.config.maxDistance,
-                                           selectDistrict=self.config.selectDistrict,
-                                           selectResult=self.config.selectResult)
-            
+        instruction, query, *configs = self.user_messages
+        query = Query(instruction=instruction,
+                      query=query,
+                      config = Config.from_configs(configs))
+        self.status, self.search_result = query.execute()
+        
+        return self
+
+    @property
+    def have_search_result(self):
+        if self.search_result: return True
+        return False
+    
     @property    
     def response(self): # -> linebot.models?
         return self._compose_response(self.status, self.search_result)
@@ -101,22 +45,23 @@ class MessageHandler:
         return list(map(lambda x: x.replace('＠', '@').replace('＃', '#'),
                         message.splitlines())) 
         
+        
     def _validate(self) -> Optional[int]:
         if len(self.user_messages) < 2:
             return 400
+        if not self.user_messages[0].startswith('@'): #? Not a search attempt
+            return 999
         if self.user_messages[0] not in ['@查詢', '@查詢地號']:
             return 400
-        
-
-    def _select_query(self, query_type):
-        USE_FUNC = {
-            '@查詢': search_applicants,
-            '@查詢地號': search_parcels
-        }
-        return USE_FUNC.get(query_type)
-    
+        if self.user_messages[0] == '@查詢地號' and \
+            not re.match(r'(.*區)(.*段)(\d{1,4}-?\d{0,4})地?號?', self.user_messages[1]):
+                return 400
+            
     
     def _compose_response(self, status, search_result=None):
+        if status == 999:
+            return 
+        
         if status > 300:
             return {
                 301: TextSendMessage(ERROR.APPLICANT_NOT_FOUND_ERROR),

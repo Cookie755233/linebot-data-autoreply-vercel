@@ -1,115 +1,250 @@
 
 import re
-from pymongo.database import Database
 
-from utils.aggregation import StageOperator
-from db._connect import _connect_mongo
-
+from utils.aggregation import StageOperator 
+from database.connect import connect_mongo
 
 operator = StageOperator()
-USE_DATABASE = _connect_mongo('cookie', 'Cokie7523').reip  #@ for debugging purpose
-# USE_DATABASE = _connect_mongo().reip
+REIP = connect_mongo().reip
 
-def search_applicants(query: str, 
-                      nearby: bool=False,
-                      maxDistance: float=100.0, 
-                      selectDistrict=None,
-                      selectResult=None,
+class Config:
+    UNIT = {'公尺': 1, '米': 1, 'm': 1, '': 1, '公里': 1000, 'km': 1000}
+    RESULT = ["#全文檢還", "#審查中", "#撤件", "#核准", "#補正", "#駁回"]
 
-                      limit: int=0,
-                      min_searchScore: int=1,
-                      db: Database=USE_DATABASE,
-                      deafult_searchScore_name: str = 'searchScore'
-                      ) -> list:
+    def __init__(self) -> None:     
+        self.search_nearby = False
+        self.maxDistance = None
 
+        self.subquery = {}
         
-    pipeline = [
-        operator.text_search(query=query, path=['applicantName'], index='keyword_index', maxEdits=1),
-        operator.set_field(field=deafult_searchScore_name, expression={'$meta': deafult_searchScore_name}),
-        operator.match( deafult_searchScore_name, { '$gt': min_searchScore } ),
-        operator.sort(field=deafult_searchScore_name),
-    ]
-    if selectDistrict: pipeline.append(operator.match( 'districtName', selectDistrict ) )
-    if selectResult: pipeline.append(operator.match( 'result', selectResult) )
-    if limit: pipeline.append(operator.limit(limit))
+    def __repr__(self) -> str:
+        return f'''
+            [ CONFIG ]
+            >> nearby         : {self.search_nearby}
+            >> maxDistance    : {self.maxDistance}
+            >> subquery
+              -- districtName : {self.districtName}
+              -- result       : {self.result}'''
 
-    search_results = list(db.applicants.aggregate(pipeline))[:12] #! narrow down to carousel limit: 12
-    
-    #? if nearby not required
-    if not nearby: 
-        if search_results: return 201, search_results
-        return 301, None
-    
-    #? if to get all nearby applicants
-    applicant_to_nearby_applicants = []
-    for item in search_results:
-        coordinates = item['center']['coordinates']
-        geo_pipeline = [
-            operator.geo_near(coordinates=coordinates, maxDistance=maxDistance),
-            operator.limit(6) #! prevent size>5000
-        ]
-        geo_results = list(db.applicants.aggregate(geo_pipeline))[1:] #? exclude itslf
-        applicant_to_nearby_applicants.append( (item, geo_results) )
+    @classmethod
+    def from_configs(cls, configs):
+        c = cls()
+        c.parse(configs)
 
-    if applicant_to_nearby_applicants:
-        return 202, applicant_to_nearby_applicants
+        return c
     
-    return 301, None
+    def parse(self, configs):
+        for config in configs:
+            if config.startswith('#鄰近'):
+                self._register_nearby_configs(config)
+                continue
+            
+            if config.startswith('#'):
+                self._register_subquery_configs(config)
+        return self
+    
+    
+    def _register_nearby_configs(self, config: str) -> None:
+        try:
+            distance, unit = re.findall(
+                r'([0-9]*[.]?[0-9]+)(公里|公尺|米|m|km)?', config)[0]
+        except ValueError:
+            return 
+        
+        self.search_nearby = True
+        self.maxDistance = float(distance) * self.UNIT[unit]
+    
+    def _register_subquery_configs(self, config: str) -> None:
+        if '區' in config:
+            try:
+                districtName, _ = re.findall(r'(.*?區)(.*?段)?', config[1:])[0]
+                districtName = None if not districtName else districtName
+            except IndexError: 
+                return 
+            
+            self.subquery['districtName'] = districtName
+            
+        elif config in self.RESULT:
+            self.subquery['result'] = config[1:] #parse the '#' in front of '#result'
 
 
-def search_parcels(query: str,
-                   nearby: bool=False, 
-                   maxDistance: float=100.0,
-                   selectDistrict=None,
-                   selectResult=None,
-                   limit: int=0,
-                   db: Database=USE_DATABASE, 
-                   ) -> list:
+class Query:
+    minimum_text_search_threshold = 1
+    db = REIP
     
-    try:
-        district, section, prcl = re.findall(
-            r'(.*區)(.*段)(\d{1,4}-?\d{0,4})地?號?', query)[0]
-    except IndexError:
-        return 400, None
+    def __init__(self, instruction=None, query=None, config=None) -> None:
+        self.instruction=instruction
+        self.query = query
+        self.config = config
+        self.search_nearby = self.config.search_nearby
+        
+        
+    @property
+    def mode(self):
+        return { '@查詢': 'a', '@查詢地號': 'p' }.get(self.instruction) 
+        
+        
+    @classmethod
+    def from_messages(cls, instruction: str, query: str, config: Config):
+        return cls(instruction=instruction, query=query, config=config)
     
-    pipeline = [
-        operator.match('districtName', district,
-                 'sectionName', section,
-                 'prcl', operator.regex(prcl)),
-        operator.lookup(from_='applicants', 
-                  local_field='_id',
-                  foreign_field='georeferencedParcels',
-                  as_='relatedApplicants'),
-    ]
+    #! <--- MAIN FUNCTION --->
+    def execute(self):        
+        pipeline = self._default_pipeline(self.mode) + self._sub_pipeline(self.config)
+        collection = self._use_collection(self.mode)
+        search_results = self._qeury_search(collection, pipeline)
+        
+        if self.search_nearby:
+            search_nearby_results = self._nearby_search(search_results)
+            return self._to_response(search_nearby_results)
+        
+        return self._to_response(search_results)
+    #! <--- MAIN FUNCTION --->
 
-    if selectResult: pipeline.append(operator.match( 'result', selectResult) )
-    if limit: pipeline.append(operator.limit(limit))
-    search_results = list(db.parcels.aggregate(pipeline))[:12]
     
-    if not nearby:
-        if search_results: return 203, search_results
-        else: return 303, None    
+    def _qeury_search(self, collection, pipeline):
+        return list(collection.aggregate(pipeline))
     
-    sub_query = dict()
-    if selectDistrict: sub_query['distictName'] = district
-    if selectResult: sub_query['result'] = result
+    def _nearby_search(self, search_results):
+        total_geo_search_results = []
+        for result in search_results:
+            coordinates = result['location']['coordinates']
+            geo_pipeline = [
+                operator.geo_near(coordinates=coordinates,
+                                  maxDistance=self.config.maxDistance,
+                                  query={}),
+                operator.limit(7)
+            ]
+            geo_search_results = (list(self.db.applicants.aggregate(geo_pipeline)))
+            #? <--- exclude itself --->
+            if self.mode == 'a':
+                geo_search_results = [ i for i in geo_search_results if result['PRSN'] != i['PRSN'] ]
+                
+            total_geo_search_results.append( (result, geo_search_results) )
+        
+        return total_geo_search_results
+                
+    
+    def _default_pipeline(self, mode):
+        if mode == 'a':
+            pipeline = [
+                operator.text_search(query=self.query, path=['applicantName'], index='keyword_index', maxEdits=1),
+                operator.set_field(field='searchScore', expression={'$meta': 'searchScore'}),
+                operator.match( 'searchScore', { '$gt': self.minimum_text_search_threshold } ),
+                operator.sort(field='searchScore'),
+            ]
 
-    parcel_to_nearby_applicants = []
-    for result in search_results:
-        coordinates = result['location']['coordinates']
-        geo_pipeline = [
-            operator.geo_near(coordinates=coordinates, 
-                        maxDistance=maxDistance,
-                        query=sub_query),
-            operator.limit(5)
-        ]
+        if mode == 'p':
+            districtName, sectionName, prcl = re.findall(r'(.*區)(.*段)(\d{1,4}-?\d{0,4})地?號?', self.query)[0]
+            pipeline = [
+                operator.match('districtName', districtName, 
+                               'sectionName', sectionName,
+                               'prcl', operator.regex(prcl)),
+                operator.lookup(from_='applicants', 
+                                local_field='_id',
+                                foreign_field='georeferencedParcels',
+                                as_='relatedApplicants'),
+            ]
+        return pipeline
+    
+    
+    def _sub_pipeline(self, config):
+        pipeline = []
+        for k, v in config.subquery.items():
+            if v: 
+                pipeline.append(operator.match(k, v))
+        print([pipeline])
+        return pipeline
 
-        geo_results = list(db.applicants.aggregate(geo_pipeline))
-        parcel_to_nearby_applicants.append( (result, geo_results) ) 
+
+    def _use_collection(self, mode):
+        return {
+            'a': self.db.applicants,
+            'p': self.db.parcels
+        }.get(mode)
+        
+
+    def _to_response(self, respond_obj):    
+        if self.mode == 'a':
+            if respond_obj: return 201 + self.search_nearby, respond_obj
+            return 301, None
+
+        if self.mode== 'p': 
+            if respond_obj: return 203 + self.search_nearby, respond_obj
+            return 303, None
+
+
+
+ 
+#@ TODO: creaet abc for Query?
+# from abc import ABC, abstractmethod
+
+# class Query(ABC):
+#     def __init__(self,
+#                  query=None,
+#                  db=None,
+#                  ) -> None:
+#         self.db = db
+#         self.query = query
+#         self.applicants_collection = self.db.applicants
+#         self.parcels_collection = self.db.parcels
+        
+#     @property
+#     @abstractmethod
+#     def pipeline(self, minimum_text_search_threshold=None, maxEdits=None):
+#         pass
+        
+#     @abstractmethod
+#     def execute(self):
+#         pass
     
+#     def 
     
-    #? <-- return -->
-    if parcel_to_nearby_applicants: 
-        return 204, parcel_to_nearby_applicants
+
+# class ApplicantSearch(Query):
+#     def __init__(self, 
+#                  query=None,
+#                  db=None,
+#                  search_nearby=False,
+#                  ) -> None:
+#         super().__init__(query=query, db=db)
+#         self.search_nearby=search_nearby
+        
+
+#     @property
+#     def pipeline(self,
+#                  minimum_text_search_threshold=1,
+#                  maxEdits=1):
+#         return [
+#                 operator.text_search(query=self.query, path=['applicantName'], index='keyword_index', maxEdits=maxEdits),
+#                 operator.set_field(field='searchScore', expression={'$meta': 'searchScore'}),
+#                 operator.match( 'searchScore', { '$gt': minimum_text_search_threshold } ),
+#                 operator.sort(field='searchScore'),
+#             ]
     
-    return 303, None
+
+# class ParcelSearch(Query):
+#     def __init__(self, 
+#                  query=None,
+#                  db=None,
+#                  search_nearby=False,
+#                  ) -> None:
+#         super().__init__(query=query, db=db)
+#         self.search_nearby=search_nearby
+
+
+#     @property
+#     def pipeline(self,
+#                  minimum_text_search_threshold=1,
+#                  maxEdits=1):
+#         districtName, sectionName, prcl = re.match(r'(.*區)(.*段)(\d{1,4}-?\d{0,4})地?號?', self.query)
+#         pipeline = [
+#             operator.match('districtName', districtName, 
+#                             'sectionName', sectionName,
+#                             'prcl', operator.regex(prcl)),
+#             operator.lookup(from_='applicants', 
+#                             local_field='_id',
+#                             foreign_field='georeferencedParcels',
+#                             as_='relatedApplicants')
+#         ]
+#         return pipeline
