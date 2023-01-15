@@ -11,6 +11,16 @@ from utils.compose import (
 import const.error as ERROR
 
 
+class NoIndicatorError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+    def __str__(self):
+        return f'The user is not calling LineBot!'
+    
+    
+    
+
 class ContentManager:
     def __init__(self, user_message=None, status=None, search_result=None) -> None:
         self.user_messages = user_message
@@ -47,6 +57,8 @@ class ContentManager:
         
         
     def _validate(self) -> Optional[int]:
+        if not self.user_messages[0].startswith('@'):
+            return 999
         if len(self.user_messages) < 2:
             return 400
         if not self.user_messages[0].startswith('@'): #? Not a search attempt
@@ -60,7 +72,7 @@ class ContentManager:
     
     def _compose_response(self, status, search_result=None):
         if status == 999:
-            return 
+            raise NoIndicatorError
         
         if status > 300:
             return {

@@ -67,7 +67,6 @@ class Config:
         elif config in self.RESULT:
             self.subquery['result'] = config[1:] #parse the '#' in front of '#result'
 
-
 class Query:
     minimum_text_search_threshold = 1
     db = REIP
@@ -153,7 +152,6 @@ class Query:
         for k, v in config.subquery.items():
             if v: 
                 pipeline.append(operator.match(k, v))
-        print([pipeline])
         return pipeline
 
 

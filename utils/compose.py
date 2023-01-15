@@ -1,5 +1,5 @@
 
-from flex.components import Carousel, Bubble
+from flex_message.components import Carousel, Bubble
 
 
 def compose_applicant_results(results):
